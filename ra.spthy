@@ -245,21 +245,20 @@ rule Step4:
 rule Step5:
 let quote = sign(<'quote', PCR_tcb, nonce>, sk)
     sig_counter = sign(<'counter', (%n %+ %1), nonce>, sk)
-    sig_host_hash = sign(<'host_hash', h(<host_hash, nonce>)>, sk)
+    //sig_host_hash = sign(<'host_hash', h(<host_hash, nonce>)>, sk)
+    host_hash = h(<host_code_hash, nonce>)
     sig_host_pid_hash = sign(<'host_pid_hash', host_pid_hash, nonce>, sk)
     in
     [
-        Daemon_state(nonce, pid_daemon, pid_app, host_hash)
+        Daemon_state(nonce, pid_daemon, pid_app, host_code_hash)
         , !TPM('ak_sk', sk)
         , !TPM('pcr_tcb', PCR_tcb)
         , TPMCounter('init', %n)
         , !PID_to_Hash(<'benign', pid_app>, host_pid_hash)
-        //, !HostHash('host_code', host_hash)
-        , !HostCode(host_code)
     ]
     --[
         CreateSignQuote(pid_app, pid_daemon, PCR_tcb, host_hash, nonce, (%n %+ %1), host_pid_hash
-                        , quote, sig_counter, sig_host_hash, sig_host_pid_hash)
+                        , quote, sig_counter, sig_host_pid_hash)
         , IncrementCounter(%n, %n %+ %1)
     ]->
     [  
@@ -268,7 +267,7 @@ let quote = sign(<'quote', PCR_tcb, nonce>, sk)
             <'return_evidences'
                 , <'quote', PCR_tcb, quote>
                 , <'counter', (%n %+ %1), sig_counter> //署名したカウンタ
-                , <'host_hash', host_hash, sig_host_hash> //署名したホストコードのハッシュ
+                , <'host_hash', host_hash> //ホストコードのハッシュ
                 , <'host_pid_hash', host_pid_hash, sig_host_pid_hash> //署名したホストPIDのハッシュ
             >
         )
@@ -285,7 +284,7 @@ rule Step6:
             <'return_evidences'
             , <'quote', PCR_tcb_recv, quote>
             , <'counter', %x, sig_counter>
-            , <'host_hash', host_hash_recv, sig_host_hash>
+            , <'host_hash', host_hash_recv>
             , <'host_pid_hash', host_pid_hash_recv, sig_host_pid_hash>
             >
         )
@@ -294,14 +293,14 @@ rule Step6:
     ]
     --[
         Recv_quote_Host(pid_app, pid_daemon, PCR_tcb_recv, host_hash_recv, %x, host_pid_hash_recv
-                        , quote, sig_counter, sig_host_hash, sig_host_pid_hash)
+                        , quote, sig_counter, sig_host_pid_hash)
     ]->
     [
         App_to_Enclave(pid_app, pid_daemon
                         , <'return_evidences'
                         , <'quote', PCR_tcb_recv, quote>
                         , <'counter', %x, sig_counter>
-                        , <'host_hash', host_hash_recv, sig_host_hash>
+                        , <'host_hash', host_hash_recv>
                         , <'host_pid_hash', host_pid_hash_recv, sig_host_pid_hash>
                         >)
     ]
@@ -315,7 +314,7 @@ rule Step7:
                         , <'return_evidences'
                         , <'quote', PCR_tcb_recv, quote>
                         , <'counter', %x, sig_counter>
-                        , <'host_hash', host_hash_recv, sig_host_hash_recv>
+                        , <'host_hash', host_hash_recv>
                         , <'host_pid_hash', host_pid_hash_recv, sig_host_pid_hash_recv>
                         >)
         , InitConfig(ak, pcr, %n, host_hash, host_pid, host_pid_hash, old_key)
@@ -337,7 +336,7 @@ rule Step7:
         , EnclaveCounter(%x, %n) //まだアテステーション終わってないのでカウンタはインクリメントしない
         , TLS_Send('Enclave', 'KMS', <sid2
                                     , <'quote', PCR_tcb_recv, quote>
-                                    , <'host_hash', host_hash_recv, sig_host_hash_recv>
+                                    , <'host_hash', host_hash_recv>
                                     >)
     ]
 
@@ -349,24 +348,24 @@ rule Step8:
      
         TLS_Recv('Enclave', 'KMS', <sid2
                                      , <'quote', PCR_tcb_recv, quote>
-                                    , <'host_hash', host_hash_recv, sig_host_hash_recv>
+                                    , <'host_hash', host_hash_recv>
                                     >)
         , Nonce(nonce)
         , !TPM('ak_pk', ak)
         , !TPM('pcr_tcb', PCR_tcb)
-        , !HostHash('host_code', host_hash)
+        , !HostHash('host_code', host_code_hash)
     ]
     --[
-        Eq(verify(sig_host_hash_recv, <'host_hash', h(<host_hash, nonce>)>, ak), true) //ホストハッシュの署名検証
-        , Eq(host_hash_recv, host_hash) //Attestation1: Hostcodeの実行時にDaemonがとったハッシュと事前のハッシュが一致しているか
+        //Eq(verify(sig_host_hash_recv, <'host_hash', h(<host_hash, nonce>)>, ak), true) //ホストハッシュの署名検証
+        Eq(host_hash_recv, h(<host_code_hash, nonce>)) //Attestation1: Hostcodeの実行時にDaemonがとったハッシュと事前のハッシュが一致しているか
 
         , Eq(verify(quote, <'quote', PCR_tcb, nonce>, ak), true) //Quoteの署名検証
         , Eq(PCR_tcb_recv, PCR_tcb) //Attestaiton2: PCRが期待するPCRと一致しているか
 
-        , KMSVerified(PCR_tcb, PCR_tcb_recv, host_hash, host_hash_recv, nonce) //これrecvいる？
+        , KMSVerified(PCR_tcb, PCR_tcb_recv, h(<host_code_hash, nonce>), host_hash_recv, nonce) //これrecvいる？
     ]->
     [
-        KMS_Verified(sid2, host_hash, PCR_tcb)
+        KMS_Verified(sid2, host_hash_recv, PCR_tcb_recv)
     ]
 
 /*
@@ -484,31 +483,31 @@ rule Cuckoo_Step4:
             pid_daemon, pid_app,
             <'cuckoo_attest_request', nonce>)
         , UDS_Request(pid_app, pid_daemon, nonce)
+        , !HostCode(host_code)
     ]
     --[
         Cuckko_Attacker4(pid_daemon, pid_app, nonce)
     ]->
     [
-        Cuckoo_Daemon_state(nonce, pid_daemon, pid_app)
+        Cuckoo_Daemon_state(nonce, pid_daemon, pid_app, h(host_code))
     ]
 
 rule Cuckko_Step5:
 let quote = sign(<'quote', PCR_tcb, nonce>, sk)
     sig_counter = sign(<'counter', (%n %+ %1), nonce>, sk)
-    sig_host_hash = sign(<'host_hash', host_hash, nonce>, sk)
+    host_hash = h(<host_code_hash, nonce>)
     sig_faked_host_pid_hash = sign(<'host_pid_hash', faked_host_pid_hash, nonce>, sk)
     in   
     [
-        Cuckoo_Daemon_state(nonce, pid_daemon, pid_app)
+        Cuckoo_Daemon_state(nonce, pid_daemon, pid_app, host_code_hash)
         , !TPM('ak_sk', sk)
         , !TPM('pcr_tcb', PCR_tcb)
         , TPMCounter('init', %n)
         , !PID_to_Hash(<'faked', pid_app>, faked_host_pid_hash)
-        , !HostHash('host_code', host_hash)
     ]
     --[
         Cuckko_Attacker5(pid_app, pid_daemon, PCR_tcb, host_hash, nonce, (%n %+ %1), faked_host_pid_hash
-                        , quote, sig_counter, sig_host_hash, sig_faked_host_pid_hash)
+                        , quote, sig_counter, sig_faked_host_pid_hash)
         , IncrementCounter(%n, %n %+ %1)
         
     ]->
@@ -518,7 +517,7 @@ let quote = sign(<'quote', PCR_tcb, nonce>, sk)
             <'return_evidences'
                 , <'quote', PCR_tcb, quote>
                 , <(%n %+ %1), sig_counter> //署名したカウンタ
-                , <'host_hash', host_hash, sig_host_hash> //署名したホストコードのハッシュ
+                , <'host_hash', host_hash> //署名したホストコードのハッシュ
                 , <'host_pid_hash', faked_host_pid_hash, sig_faked_host_pid_hash> //署名したホストPIDのハッシュ
             >
         )
@@ -532,7 +531,7 @@ rule Cuckoo_Step6:
             <'return_evidences'
             , <'quote', PCR_tcb_recv, quote>
             , <'counter', %x, sig_counter>
-            , <'host_hash', host_hash_recv, sig_host_hash>
+            , <'host_hash', host_hash_recv>
             , <'host_pid_hash', faked_host_pid_hash_recv, sig_faked_host_pid_hash>
             >
         )
@@ -541,14 +540,14 @@ rule Cuckoo_Step6:
     ]
     --[
         Cuckoo_Attacker6(pid_app, pid_daemon, PCR_tcb_recv, host_hash_recv, %x, faked_host_pid_hash_recv
-                        , quote, sig_counter, sig_host_hash, sig_faked_host_pid_hash)
+                        , quote, sig_counter, sig_faked_host_pid_hash)
     ]->
     [
         App_to_Enclave(pid_app, pid_daemon
                         , <'return_evidences'
                         , <'quote', PCR_tcb_recv, quote>
                         , <'counter', %x, sig_counter>
-                        , <'host_hash', host_hash_recv, sig_host_hash>
+                        , <'host_hash', host_hash_recv>
                         , <'host_pid_hash', faked_host_pid_hash_recv, sig_faked_host_pid_hash>
                         >)
     ]
@@ -604,7 +603,7 @@ lemma correctness_trace:
     exists-trace
     "
     Ex  sid nonce pid_app pid_daemon PCR_tcb %old %inc_cnt 
-        quote sig_cnt sig_host_hash sig_host_pid_hash
+        quote sig_cnt sig_host_pid_hash
         PCR_tcb_recv host_pid_hash host_hash host_hash_recv key
         #i #j #k2 #k3 #l #l2 #m1 #n #o1 #o2 #p #q #r.
         
@@ -613,9 +612,9 @@ lemma correctness_trace:
         Attest_request_Host_To_Daemon(pid_app, pid_daemon, nonce) @ #k2 &
         Attest_request_Recv_Daemon(pid_app, pid_daemon, nonce) @ #k3 &
         CreateSignQuote(pid_app, pid_daemon, PCR_tcb, host_hash, nonce, %inc_cnt, host_pid_hash
-                        , quote, sig_cnt, sig_host_hash, sig_host_pid_hash) @ #l & 
+                        , quote, sig_cnt, sig_host_pid_hash) @ #l & 
         Recv_quote_Host(pid_app, pid_daemon, PCR_tcb, host_hash, %inc_cnt, host_pid_hash
-                        , quote, sig_cnt, sig_host_hash, sig_host_pid_hash) @ #l2 &
+                        , quote, sig_cnt, sig_host_pid_hash) @ #l2 &
         EnclaveVerified(pid_app, pid_daemon, nonce, %old, %inc_cnt, host_pid_hash, sig_host_pid_hash) @ #m1 &
         KMSVerified(PCR_tcb, PCR_tcb_recv, host_hash, host_hash_recv, nonce)@ #n & 
         KMSSendAccept(sid, PCR_tcb) @ #o1 &
@@ -633,15 +632,15 @@ lemma correctness_trace_cuckoo_attack:
 exists-trace
 "
 Ex host_pid_hash pid_app pid_daemon nonce PCR_tcb host_hash %cnt faked_host_pid_hash 
-   quote sig_counter sig_host_hash sig_host_pid_hash sig_faked_host_pid_hash //%old 
+   quote sig_counter sig_host_pid_hash sig_faked_host_pid_hash //%old 
    #a #i #j #k #l .//#m.
     CuckooPID(host_pid_hash, faked_host_pid_hash) @ #a &
     Cuckko_Attacker3(pid_app, pid_daemon, nonce) @ #i &
     Cuckko_Attacker4(pid_daemon, pid_app, nonce) @ #j &
     Cuckko_Attacker5(pid_app, pid_daemon, PCR_tcb, host_hash, nonce, (%cnt %+ %1), faked_host_pid_hash
-                    , quote, sig_counter, sig_host_hash, sig_faked_host_pid_hash) @ #k &
+                    , quote, sig_counter, sig_faked_host_pid_hash) @ #k &
     Cuckoo_Attacker6(pid_app, pid_daemon, PCR_tcb, host_hash, (%cnt %+ %1), faked_host_pid_hash
-        , quote, sig_counter, sig_host_hash, sig_host_pid_hash) @ #l &
+        , quote, sig_counter, sig_host_pid_hash) @ #l &
     //EnclaveVerified(%old, %cnt, host_pid_hash, sig_host_pid_hash) @ #m &
     #i < #j & #j < #k & #k < #l //& #l < #m
 "
@@ -690,9 +689,9 @@ lemma L_integrity1:
   "All PCR_tcb PCR_tcb_recv host_hash host_hash_recv nonce #i.
       KMSVerified(PCR_tcb, PCR_tcb_recv, host_hash, host_hash_recv, nonce) @ #i
       ==>
-      Ex pid_app pid_daemon %cnt host_pid_hash quote sig_counter sig_host_hash sig_host_pid_hash#j.
+      Ex pid_app pid_daemon %cnt host_pid_hash quote sig_counter sig_host_pid_hash#j.
         CreateSignQuote(pid_app, pid_daemon, PCR_tcb, host_hash, nonce, %cnt, host_pid_hash
-            , quote, sig_counter, sig_host_hash, sig_host_pid_hash) @ #j
+            , quote, sig_counter, sig_host_pid_hash) @ #j
         & #j < #i"
 
 //Daemonから渡されているのは真正，AKで署名されている
@@ -809,10 +808,10 @@ lemma L_cuckoo1:
 lemma L_no_cuckoo_enclave_accept:
     "  
     All pid_app pid_daemon nonce PCR_tcb host_hash %cnt faked_host_pid_hash 
-    quote sig_counter sig_host_hash sig_faked_host_pid_hash %old accepted_host_pid_hash accepted_sig_host_pid_hash
+    quote sig_counter sig_faked_host_pid_hash %old accepted_host_pid_hash accepted_sig_host_pid_hash
     #i #j.
         Cuckko_Attacker5(pid_app, pid_daemon, PCR_tcb, host_hash, nonce, %cnt, faked_host_pid_hash
-                        , quote, sig_counter, sig_host_hash, sig_faked_host_pid_hash) @ #i &
+                        , quote, sig_counter, sig_faked_host_pid_hash) @ #i &
         EnclaveVerified(pid_app, pid_daemon, nonce, %old, %cnt, accepted_host_pid_hash, accepted_sig_host_pid_hash) @ #j &
         #i < #j 
         ==>

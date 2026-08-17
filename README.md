@@ -1,7 +1,7 @@
-'''console
+```
 % tamarin-prover --prove --output-dot=ra.dot ra.spthy
 % dot -Tpng -O ra.dot 
-'''
+```
 
 result (ra.spthy)
 ==============================================================================

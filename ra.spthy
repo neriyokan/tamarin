@@ -1,0 +1,731 @@
+theory Enclave_Integrity_Online
+begin
+
+builtins: signing, asymmetric-encryption, symmetric-encryption, hashing
+builtins: natural-numbers
+
+/* ==============================================================================
+   0. グローバル制約 (Restrictions)
+   ============================================================================== */
+restriction Once:
+    "All tag #i #j. 
+    Once(tag) @i 
+    & Once(tag) @j 
+    ==> #i = #j"
+
+restriction Equality:
+	"All x y #i. Eq(x, y) @i ==> x = y"
+
+restriction Inequality:
+	"All x #i. Neq(x, x) @ #i ==> F"
+
+restriction LessThan:
+  "All x y #i.
+     LessThan(x,y) @ #i
+     ==> x ⊏ y"
+
+/* ==============================================================================
+   1. Channel
+   ============================================================================== */
+//TLS channel
+rule TLS_Send_Recv:
+    [
+        TLS_Send(A, B, <tag, sid, msg>)
+    ]
+    --[
+        TLS_Record(A, B, <tag, sid, msg>)
+    ]->
+    [
+        TLS_Recv(A, B, <tag, sid, msg>)
+    ]
+
+//Unix domain socet
+rule R_unix_socket_1:
+     [ Unix_Socket_Send(pid_send, pid_recv, <tag, msg>)
+     ]-->[
+       Out(<pid_send, pid_recv, <tag, msg>>) ]
+rule R_unix_socket_2:
+     [ In(<pid_recv, pid_send, <tag, msg>>)
+     ]-->[
+      Unix_Socket_Recv(pid_recv, pid_send, <tag, msg>) ]
+
+/* ==============================================================================
+   2. Roles
+   ============================================================================== */
+/* deployment */
+rule TPM_Init:
+     [
+       Fr(~sk)
+     , Fr(~pcr_tcb)
+    ]
+     --[ Once('deloyment') ]->
+     [
+      !TPM('ak_sk', ~sk)
+    , !TPM('ak_pk', pk(~sk))
+    , !TPM('pcr_tcb', ~pcr_tcb)
+    ]
+
+rule Init_Counter:
+    []
+  --[ 
+        Once('init_counter')
+        , Value(%1)
+  ]->
+    [
+      TPMCounter('init', %1)
+      , Init_Counter(%1)
+    ]
+/* Host */
+rule Init_Host:
+    [
+        Fr(~host_hash)
+    ]
+    --[ Once('init_host') ]->
+    [
+        !HostHash('host_code', ~host_hash)
+    ]
+/*#ifdef not CUCKOO
+rule Init_Process_Global:
+    [
+        Fr(~host_pid)
+        , Fr(~daemon_pid)
+    ]
+    --[
+        Once('init_process_global')
+    ]->
+    [
+        //PID(<'benign', ~host_pid>)
+        //, PID(<'Daemon', ~daemon_pid>)
+        !PID(~host_pid, ~daemon_pid)
+        , !PID_to_Hash(<'benign', ~host_pid>, h(~host_pid))
+    ]
+#endif
+
+#ifdef CUCKOO
+*/
+/* Process ID & hash(PID) */
+rule Init_Process_Global:
+    [
+        Fr(~host_pid)
+        , Fr(~daemon_pid)
+        , Fr(~faked_host_pid)
+        , Fr(~faked_daemon_pid)
+    ]
+    --[
+        Once('init_process_global')
+    ]->
+    [
+        !PID(~host_pid, ~daemon_pid)
+        , !PID_to_Hash(<'benign', ~host_pid>, h(~host_pid))
+
+        , !FakedPID(~faked_host_pid, ~faked_daemon_pid)
+        , !PID_to_Hash(<'faked', ~faked_host_pid>, h(~faked_host_pid))
+        
+    ]
+//#endif
+
+/* Enclave */
+rule Init_Enclave:
+    [
+        !TPM('ak_pk', new_ak)
+        , !TPM('pcr_tcb', pcr_tcb)
+        , Init_Counter(%n)
+        , !HostHash('host_code', host_hash)
+        , !PID_to_Hash(<'benign', host_pid>, host_pid_hash)
+        , Fr(~seal_key)
+        , Fr(~key)
+    ]
+    --[
+        Once('init_enclave')
+        , SealKeyCreated(~seal_key)
+    ]->
+    [
+        InitConfig(new_ak, pcr_tcb, %n, host_hash, host_pid, host_pid_hash, ~key)
+        , !SealingKey(~seal_key)
+    ]
+/* ==============================================================================
+   3. プロトコル・ルール
+   ============================================================================== */
+/*
+ * KMS sends server hello with nonce to Enclave for verifying no-replay.　client helloは省略．
+ */
+rule Step1:
+    [
+        Fr(~nonce)
+        , Fr(~sid)
+    ]
+    --[ 
+        KMSIssuedNonce( ~sid, ~nonce)
+        , Once('start')
+        ]->
+    [
+        TLS_Send('KMS', 'Enclave', <'nonce', ~sid, ~nonce>)
+        , Nonce(~nonce)
+    ]
+
+/* 
+ * Enclave receives nonce from KMS 
+ * , creates nonce for protecting replay attack between unix domain socket
+ * and returns to Host.
+ */
+rule Step2:
+    [
+        TLS_Recv('KMS', 'Enclave', <'nonce', sid, ~nonce>)
+        , Fr(~nonce_uds)
+    
+    ]
+    --[
+        Enclave_Recv_Nonce(sid, ~nonce)
+        , EnclaveIssuedNonce(~nonce_uds)
+    ]->
+    [
+        SID(sid)
+        , Nonce_in_Enclave(~nonce, ~nonce_uds)
+    ]
+
+/*
+ * Host sends nonces to Daemon on Unix domain socket
+ */
+rule Step3:
+    [
+        Nonce_in_Enclave(~nonce, ~nonce_uds)//nonceをfreshにしたらめっちゃ速くなった
+        , !PID(pid_app, pid_daemon)
+        
+    ]
+    --[
+        Attest_request_Host_To_Daemon(pid_app, pid_daemon, ~nonce, ~nonce_uds)
+        , Once('attest_request')
+    ]->
+    [
+        Enclave_Waite_Quote(pid_app, pid_daemon, ~nonce, ~nonce_uds)
+        , Unix_Socket_Send(
+            pid_app, pid_daemon
+            , <'attest_request', <~nonce, ~nonce_uds>>
+        )
+    ]
+
+/*
+ * Daemon recives nonce and nonce_uds from Host.
+ */
+rule Step4:
+    [
+        Unix_Socket_Recv(
+            pid_daemon, pid_app,
+            <'attest_request', <nonce, nonce_uds>>)
+    ]
+    --[
+        Attest_request_Recv_Daemon(pid_daemon, pid_app, nonce, nonce_uds)
+    ]->
+    [
+        Daemon_state(nonce, nonce_uds, pid_daemon, pid_app)
+    ]
+
+/*
+ * Daemon creates and signs quote, and increment counter.
+ * Daemon sends these to Host on Unix domain socket.
+ */
+rule Step5:
+let
+    quote = sign(<'quote', PCR_tcb, nonce>, sk)
+    quote_with_nonce_uds = sign(<'quote_nonce_uds', quote, nonce_uds>, sk) in     
+    [
+        Daemon_state(nonce, nonce_uds, pid_daemon, pid_app)
+        , !TPM('ak_sk', sk)
+        , !TPM('pcr_tcb', PCR_tcb)
+        , TPMCounter('init', %n)
+        , !PID_to_Hash(<'benign', pid_app>, host_pid_hash)
+        , !HostHash('host_code', host_hash)
+    ]
+    --[
+        Create_Sign_quote(PCR_tcb, host_hash, nonce, nonce_uds, (%n %+ %1), host_pid_hash)
+        , DaemonCreatedQuote(PCR_tcb, host_hash, nonce)
+        , IncrementCounter(%n, %n %+ %1)
+        , Send_quote_Daemon(nonce_uds)
+        //, Once('return_evidences')
+    ]->
+    [  
+        Unix_Socket_Send(
+            pid_daemon, pid_app, 
+            <'return_evidences'
+                , PCR_tcb
+                , quote, quote_with_nonce_uds //quote, nonce_udsをいれて署名したquote
+                , <(%n %+ %1), sign(<'counter', (%n %+ %1), nonce_uds>, sk)> //署名したカウンタ
+                , <'host_hash', host_hash, sign(<'host_hash', host_hash>, sk)> //署名したホストコードのハッシュ
+                , <'host_pid_hash', host_pid_hash, sign(<'host_pid_hash', host_pid_hash>, sk)> //署名したホストPIDのハッシュ
+            >
+        )
+        , TPMCounter('inc', %n %+ %1)
+    ]
+
+/*
+ * Host recives evidence from Daemon and send it to Enclave.
+ */
+rule Step6:     
+    [
+        Unix_Socket_Recv(
+            pid_app, pid_daemon, 
+            <'return_evidences'
+            , PCR_tcb_recv
+            , quote , quote_with_nonce_uds
+            , <%x, sig_counter>
+            , <'host_hash', host_hash_recv, sig_host_hash_recv>
+            , <'host_pid_hash', host_pid_hash_recv, sig_host_pid_hash>
+            >
+        )
+        , !HostHash('host_code', host_hash)
+
+    ]
+    --[
+        Recv_quote_Host(pid_app, pid_daemon, %x, PCR_tcb_recv)
+    ]->
+    [
+        App_to_Enclave(<'return_evidences'
+                        , PCR_tcb_recv
+                        , quote, quote_with_nonce_uds
+                        , <%x, sig_counter>
+                        , <'host_hash', host_hash_recv, sig_host_hash_recv>
+                        , <'host_pid_hash', host_pid_hash_recv, sig_host_pid_hash>
+                        >)
+    ]
+
+/*
+ * Enclave verifies nonce_uds and send data to KMS.
+ */
+rule Step7:
+    [
+        App_to_Enclave(<'return_evidences'
+                        , PCR_tcb_recv
+                        , quote, quote_with_nonce_uds
+                        , <%x, sig_counter>
+                        , <'host_hash', host_hash_recv, sig_host_hash_recv>
+                        , <'host_pid_hash', host_pid_hash_recv, sig_host_pid_hash_recv>
+                        >)
+        , InitConfig(ak, pcr, %n, host_hash, host_pid, host_pid_hash, old_key)
+        , Enclave_Waite_Quote(pid_app, pid_daemon, nonce, nonce_uds)
+        , SID(sid2)
+    ]
+    --[
+        
+        Eq(verify(sig_counter, <'counter', %x, nonce_uds>, ak), true) //カウンタの署名検証
+        , Eq((%n %+ %1), %x) //インクリメント要求が通ったことの確認
+
+        , Eq(verify(quote_with_nonce_uds, <'quote_nonce_uds', quote, nonce_uds>, ak), true) //quote_with_nonce_udsの署名検証
+
+        , Eq(verify(sig_host_pid_hash_recv, <'host_pid_hash', host_pid_hash_recv>, ak), true) //ホストPIDハッシュの署名検証
+        ,  Eq(host_pid_hash, host_pid_hash_recv) //cuckoo attackの検知
+
+        , EnclaveVerified(%n, %x, PCR_tcb_recv, nonce_uds, host_pid_hash_recv)
+        , AppVerifiedHash(host_pid_hash, host_pid_hash_recv)
+        , Recv_quote_Enclave(nonce_uds)
+    ]->
+    [
+        CuckooConfig(ak, pcr, %n, host_hash, host_pid, host_pid_hash_recv, old_key) //Cuckooは検知済み
+        , EnclaveCounter(%x, %n) //まだアテステーション終わってないのでカウンタはインクリメントしない
+        , TLS_Send('Enclave', 'KMS', <sid2
+                                    , <PCR_tcb_recv, quote>
+                                    , <'host_hash', host_hash_recv, sig_host_hash_recv>
+                                    >)
+    ]
+
+/*
+ * KMS recives quote from Enclave and verify.
+ */
+rule Step8:  
+    [
+     
+        TLS_Recv('Enclave', 'KMS', <sid2
+                                     , <PCR_tcb_recv, quote>
+                                    , <'host_hash', host_hash_recv, sig_host_hash_recv>
+                                    >)
+        , Nonce(nonce)
+        , !TPM('ak_pk', ak)
+        , !TPM('pcr_tcb', PCR_tcb)
+        , !HostHash('host_code', host_hash)
+    ]
+    --[
+        Eq(verify(sig_host_hash_recv, <'host_hash', host_hash>, ak), true) //ホストハッシュの署名検証
+        , Eq(host_hash_recv, host_hash) //Attestation1: Hostcodeの実行時にDaemonがとったハッシュと事前のハッシュが一致しているか
+
+        , Eq(verify(quote, <'quote', PCR_tcb, nonce>, ak), true) //Quoteの署名検証
+        , Eq(PCR_tcb_recv, PCR_tcb) //Attestaiton2: PCRが期待するPCRと一致しているか
+
+        , KMSVerified(PCR_tcb, PCR_tcb_recv, host_hash, host_hash_recv, nonce)
+    ]->
+    [
+        KMS_Verified(sid2, host_hash, PCR_tcb)
+    ]
+
+/*
+ * KMS sends notice of acceptance to Enclave.
+ */
+rule Step9:
+    [
+        KMS_Verified(sid2, host_hash, PCR_tcb)
+        , Fr(~new_key)
+    ]
+    --[
+        KMSSendAccept(sid2, PCR_tcb)
+    ]->
+    [
+        TLS_Send('KMS', 'Enclave', <'accpet', sid2, host_hash, PCR_tcb, ~new_key>)
+    ]
+
+/*
+ * Enclave recives the acceptance.
+ */
+rule Step10:
+    [
+        TLS_Recv('KMS', 'Enclave', <'accpet', sid2, host_hash, PCR_tcb, new_key>)
+        , EnclaveCounter(%new, %old)
+    ]
+    --[
+        EnclaveRecvAccept(sid2, PCR_tcb, host_hash, %new, new_key)
+    ]->
+    [
+        Enclave_Verified_PCR(PCR_tcb, host_hash, %new, new_key) //attestationできたので，ここでカウンタを更新
+    ]
+
+/*
+ * Enclave seals new evidences, host hash, counter, and key in the config file after attestation.
+ */
+rule Step11:
+let config_payload = <'version-x', ak, new_pcr, %new, new_host_hash, ~host_pid, host_pid_hash, ~new_key> in
+    [
+        Enclave_Verified_PCR(new_pcr, new_host_hash, %new, ~new_key)
+        , CuckooConfig(ak, old_pcr, %old, old_host_hash, ~host_pid, host_pid_hash, old_key)
+        , !SealingKey(~seal_key)
+    ]
+    --[
+        Store(new_pcr, new_host_hash, %new, ~new_key)
+    ]->
+    [
+        SealedConfig(ak, new_pcr, %new, new_host_hash, ~host_pid, host_pid_hash, ~new_key) //新しいエビデンスとカウンタをconfigに書き込み
+        , Out(<'sealing', senc(config_payload, ~seal_key)>)
+    ]
+
+/*
+ * Enclave unseals them and check counter by compareing TPM counter.
+ */
+rule Load_Sealed_State:
+let config_payload = <'version-x', ak, new_pcr, %new, new_host_hash, host_pid, host_pid_hash, new_key> in
+    [
+        In(<'sealing', senc(config_payload, seal_key)>)
+        , !SealingKey(seal_key)
+        , TPMCounter('inc', %cnt)
+    ]
+    --[
+        Eq(%cnt, %new)
+        , CounterVerified(%cnt, %new)
+        , LoadSealedState(new_pcr, new_host_hash, %new, new_key)
+    ]->
+    [
+        LoadedConfig(ak, new_pcr, %new, new_host_hash, host_pid, host_pid_hash, new_key)
+        , TPMCounter('store', %cnt)
+    ]
+
+/*
+ * Enclave runs
+ */
+rule Enclave_Commit:
+    [ 
+        LoadedConfig(ak, new_pcr, %new, new_host_hash, host_pid, host_pid_hash, new_key)
+    ]
+  --[ 
+        EnclaveCommit(new_pcr, new_host_hash, %new)
+    ]->
+    [   
+        Enclave_Running(new_pcr, new_host_hash, %new)
+        //Config(ak, new_pcr, %new, new_host_hash, host_pid, host_pid_hash, new_key)
+    ]
+
+/* ==============================================================================
+   2. 脅威モデル（攻撃者の能力）
+   ============================================================================== */
+
+//#ifdef CUCKOO
+// cuckko attack    
+rule Cuckoo_Step3:
+    [
+        Nonce_in_Enclave(~nonce, ~nonce_uds) //不正ホストにリレー
+        , !FakedPID(pid_app, pid_daemon)
+        
+    ]
+    --[
+        Cuckko_Attacker1(pid_app, pid_daemon, ~nonce, ~nonce_uds)
+        , Once('attest_request')
+    ]->
+    [
+        Enclave_Waite_Quote(pid_app, pid_daemon, ~nonce, ~nonce_uds)
+        , Unix_Socket_Send(
+            pid_app, pid_daemon
+            , <'cuckoo_attest_request', <~nonce, ~nonce_uds>>
+        )
+        , UDS_Request(pid_app, pid_daemon, ~nonce, ~nonce_uds)
+    ]
+
+rule Cuckoo_Step4:
+    [
+        Unix_Socket_Recv(
+            pid_daemon, pid_app,
+            <'cuckoo_attest_request', <nonce, nonce_uds>>)
+        , UDS_Request(pid_app, pid_daemon, nonce, nonce_uds)
+    ]
+    --[
+        Cuckko_Attacker2(pid_daemon, pid_app, nonce, nonce_uds)
+    ]->
+    [
+        Cuckoo_Daemon_state(nonce, nonce_uds, pid_daemon, pid_app)
+    ]
+
+rule Cuckko_Step5:
+let
+quote = sign(<'quote', PCR_tcb, nonce>, sk)
+quote_with_nonce_uds = sign(<'quote_nonce_uds', quote, nonce_uds>, sk) in     
+    [
+        Cuckoo_Daemon_state(nonce, nonce_uds, pid_daemon, pid_app)
+        , !TPM('ak_sk', sk)
+        , !TPM('pcr_tcb', PCR_tcb)
+        , TPMCounter('init', %n)
+        , !PID_to_Hash(<'faked', pid_app>, faked_host_pid_hash)
+        , !HostHash('host_code', host_hash)
+    ]
+    --[
+        Cuckko_Attacker3(pid_app, PCR_tcb, host_hash, nonce, nonce_uds, (%n %+ %1), faked_host_pid_hash)
+        //, DaemonCreatedQuote(PCR_tcb, host_hash, nonce)
+        , IncrementCounter(%n, %n %+ %1)
+        //, Send_quote_Daemon(nonce_uds)
+        //, Once('return_evidences')
+        
+    ]->
+    [  
+        Unix_Socket_Send(
+            pid_daemon, pid_app, 
+            <'return_evidences'
+                , PCR_tcb
+                , quote, quote_with_nonce_uds //quote, nonce_udsをいれて署名したquote
+                , <(%n %+ %1), sign(<'counter', (%n %+ %1), nonce_uds>, sk)> //署名したカウンタ
+                , <'host_hash', host_hash, sign(<'host_hash', host_hash>, sk)> //署名したホストコードのハッシュ
+                , <'host_pid_hash', faked_host_pid_hash, sign(<'host_pid_hash', faked_host_pid_hash>, sk)> //署名したホストPIDのハッシュ
+            >
+        )
+        , TPMCounter('inc', %n %+ %1)
+    ]
+//#endif
+
+/* ==============================================================================
+   3. Correctness Trace (Lemmas)
+   ============================================================================== */
+lemma correctness_trace:
+    exists-trace
+    "
+    Ex  sid nonce pid_app pid_daemon nonce_uds PCR_tcb %old %inc_cnt PCR_tcb_recv
+        host_pid_hash host_pid_hash_recv host_hash host_hash_recv key
+        #i #j #k2 #k3 #l #l2 #m1 #n #o1 #o2 #p #q #r.
+        
+        KMSIssuedNonce(sid, nonce) @ #i &
+        Enclave_Recv_Nonce(sid, nonce) @ #j &
+        Attest_request_Host_To_Daemon(pid_app, pid_daemon, nonce, nonce_uds) @ #k2 &
+        Attest_request_Recv_Daemon(pid_daemon, pid_app, nonce, nonce_uds) @ #k3 &
+        Create_Sign_quote(PCR_tcb, host_hash, nonce, nonce_uds, %inc_cnt, host_pid_hash) @ #l & 
+        Recv_quote_Host(pid_app, pid_daemon, %inc_cnt, PCR_tcb_recv) @ #l2 &
+        EnclaveVerified(%old, %inc_cnt, PCR_tcb_recv, nonce_uds, host_pid_hash_recv) @ #m1 &
+        KMSVerified(PCR_tcb, PCR_tcb_recv, host_hash, host_hash_recv, nonce)@ #n & 
+        KMSSendAccept(sid, PCR_tcb) @ #o1 &
+        EnclaveRecvAccept(sid, PCR_tcb, host_hash, %inc_cnt, key) @ #o2 &
+        Store(PCR_tcb, host_hash, %inc_cnt, key) @ #p &
+        LoadSealedState(PCR_tcb, host_hash, %inc_cnt, key) @ #q &
+        EnclaveCommit(PCR_tcb_recv, host_hash_recv, %inc_cnt) @ #r &
+    
+        #i < #j & #j < #k2  & #k2 < #k3  &  #k3 < #l & #l < #l2
+        & #l2 < #m1 & #m1 < #n  &
+        #n < #o1  &  #o1 < #o2  &  #o2 < #p & #p < #q & #q < #r
+    "
+//#ifdef CUCKOO
+lemma correctness_trace_cuckoo_attack:
+exists-trace
+"
+Ex pid_app pid_daemon nonce nonce_uds PCR_tcb host_hash %cnt faked_host_pid_hash #i #j #k #l.
+    Cuckko_Attacker1(pid_app, pid_daemon, nonce, nonce_uds) @ #i &
+    Cuckko_Attacker2(pid_daemon, pid_app, nonce, nonce_uds) @ #j &
+    Cuckko_Attacker3(pid_app, PCR_tcb, host_hash, nonce, nonce_uds, (%cnt %+ %1), faked_host_pid_hash) @ #k &
+    Recv_quote_Host(pid_app, pid_daemon, %cnt, PCR_tcb) @ #l &
+    #i < #j & #j < #k & #k < #l
+"
+//#endif
+/* ==============================================================================
+   4. セキュリティ補題 (Lemmas)
+   ============================================================================== */
+
+
+/*
+ * HostはAttester Daemonから最新のデータを受信する freshness
+ */
+lemma L_correspondence:
+    "All nonce_uds #j.
+		Recv_quote_Enclave(nonce_uds) @ #j
+		==> Ex #i. Send_quote_Daemon(nonce_uds) @ #i
+		& #i < #j "
+
+
+/* 
+ * replay attack
+ */
+
+//KMSがQuoteをVerifiedできたら，そのnonceは1度しか使われない
+lemma L_no_replay_attack_on_verifier_fresh:
+    "All PCR_tcb PCR_tcb_recv host_hash host_hash_recv nonce #i.
+      KMSVerified(PCR_tcb, PCR_tcb_recv, host_hash, host_hash_recv, nonce) @ #i
+      ==>
+      Ex sid #j.
+        KMSIssuedNonce(sid, nonce) @ #j
+        & #j < #i
+    "
+//KMSがQuoteをVerifiedできたら，KMSが発行したnonceと一致している
+lemma L_no_replay_attack_on_verifier_unique:
+    "All PCR_tcb PCR_tcb_recv host_hash host_hash_recv nonce #i1 #i2.
+            KMSVerified(PCR_tcb, PCR_tcb_recv, host_hash, host_hash_recv, nonce) @ #i1
+            & KMSVerified(PCR_tcb, PCR_tcb_recv, host_hash, host_hash_recv, nonce) @ #i2
+            ==>
+            #i1 = #i2"
+
+//EnclaveがQuoteをVerifiedできたら，そのnonceは1度しか使われない
+lemma L_no_replay_attack_on_enclave_fresh:
+    "All nonce_uds #i.
+      Recv_quote_Enclave(nonce_uds)@ #i
+      ==>
+      Ex #j.
+        EnclaveIssuedNonce(nonce_uds) @ #j
+        & #j < #i"
+
+//EnclaveがQuoteをVerifiedできたら，Enclaveが発行したnonceと一致している
+lemma L_no_replay_attack_on_enclave_unique:
+    "All nonce_uds #i1 #i2.
+            Recv_quote_Enclave(nonce_uds) @ #i1
+        &   Recv_quote_Enclave(nonce_uds) @ #i2
+        ==>    
+        #i1 = #i2"
+
+/*
+ * Integrity
+ */
+//KMSとEnclaveがacceptしたエビデンスと同一のエビデンスをDaemonが作成した
+lemma L_integrity:
+  "All PCR_tcb PCR_tcb_recv host_hash host_hash_recv nonce  #i.
+      KMSVerified(PCR_tcb, PCR_tcb_recv, host_hash, host_hash_recv, nonce) @ #i
+      ==>
+      Ex #j.
+        DaemonCreatedQuote(PCR_tcb, host_hash, nonce) @ #j
+        & #j < #i"
+
+//#ifdef ROLLBACK
+/*
+ * Rollback attack
+ */
+//同じcounterは一度しか更新しない freshness
+lemma L_rollback1:
+  "
+  All %n #i #j.
+    IncrementCounter(%n, %n %+ %1) @ #i
+    & IncrementCounter(%n, %n %+ %1) @ #j
+    ==>
+    #i = #j
+  "
+//同じカウンタで2状態がLoadされない freshness
+lemma L_rollback2:
+  "
+    All pcr1 pcr2 host_hash1 host_hash2 %cnt key1 key2 #i #j.
+        Store(pcr1, host_hash1, %cnt, key1) @ #i &
+        Store(pcr2, host_hash2, %cnt, key2) @ #j
+        ==>
+        pcr1 = pcr2 &
+        host_hash1 = host_hash2 &
+        key1 = key2 &
+        #i = #j
+  "
+//すべての場合でconfigのカウンタと現在のカウンタは一致している
+//現在のカウンタと等しくないカウンタをもつconfigはLoadしない integrity
+lemma L_rollback3:
+    "
+    All %cnt %new #i.
+        CounterVerified(%cnt, %new) @ #i
+        ==>
+        %cnt = %new
+    "
+//Enclaveがcounterのインクリメントを要求したあとは，かならず前のcounterよりも大きくなって，1増えている
+lemma L_rollback4:
+    "
+    All %old %cnt pcr nonce_uds host_pid_hash #i.
+        EnclaveVerified(%old, %cnt, pcr, nonce_uds, host_pid_hash) @ #i
+        ==>
+        (%old %+ %1) = %cnt
+    "
+//TPMカウンタをインクリメントしてからカウンタの署名を検証 
+lemma L_rollback5:
+    "
+    All %old %cnt pcr nonce_uds host_pid_hash #j.
+        EnclaveVerified(%old, %cnt, pcr, nonce_uds, host_pid_hash) @ #j
+        ==>
+        Ex #i.
+            IncrementCounter(%old, %cnt) @ #i &
+            #i < #j
+    "
+//Configにカウンタを保存するたびにカウンタは大きくなっている
+lemma L_rollback6:
+    "
+    All pcr1 pcr2 host_hash1 host_hash2 %cnt1 %cnt2 key1 key2 #i #j.
+        Store(pcr1, host_hash1, %cnt1, key1) @ #i &
+        Store(pcr2, host_hash2, %cnt2, key2) @ #j &
+        #i < #j
+        ==>
+            %cnt1 << %cnt2
+    "
+//Configが改ざんれていない　integrity
+lemma L_rollback7:
+    "
+    All pcr host_hash %cnt key #i.
+        LoadSealedState(pcr, host_hash, %cnt, key) @ #i
+        ==>
+        Ex #j.
+            Store(pcr, host_hash, %cnt, key) @ #j &
+            #j < #i
+
+    "
+//#endif
+
+//#ifdef CUCKOO
+/*
+ * Cuckoo Attack
+ */
+//HostのPIDに基づいて生成したhashと，Daemonから返ってきたPIDに基づくhashは等しい authenticy
+//すべてのtraceの場合で，Hostはhost_hash = host_hash_recv
+lemma L_cuckoo1:
+    "
+    All host_pid_hash host_pid_hash_recv #i.
+        AppVerifiedHash(host_pid_hash, host_pid_hash_recv) @ #i
+        ==>
+        host_pid_hash = host_pid_hash_recv
+    "
+
+//cuckoo attackerがfakedなPIDハッシュをEnclaveに渡してもVerifiedされることはない biding
+lemma L_no_cuckoo_enclave_accept:
+    "
+    All
+        pid_app pcr host_hash nonce nonce_uds %cnt faked_host_pid_hash %old #i #j.
+        Cuckko_Attacker3(pid_app, pcr, host_hash, nonce, nonce_uds, %cnt, faked_host_pid_hash) @ #i &
+        EnclaveVerified(%old, %cnt, pcr, nonce_uds, faked_host_pid_hash) @ #j
+        ==>
+            F
+    "
+//#endif
+
+/*
+ * sealing keyのsecrecy
+ */
+ lemma L_seal_key_secrecy:
+    "
+    All key #i.
+        SealKeyCreated(key) @ #i
+        ==>
+        not (Ex #j. K(key) @ #j)
+    "
+end

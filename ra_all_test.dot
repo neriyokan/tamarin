@@ -1,0 +1,460 @@
+digraph "trace_Enclave_Integrity_Online_SL2-AS0-CL0-A1-C1-NB_correctness_trace-Init_KMS-Init_KMS-Init_Enclave-Init_Enclave-TLS_Send_Recv-Init_Host-Init_Host-Init_Process_Application-R_Ocall_Host-Host_Step1-Init_Process_Daemon-Init_Daemon-Init_Daemon-R_unix_socket_2-Init_Host-Init_Enclave-Daemon_Step1-TPM_Init-TPM_Init-Init_Counter-Host_Step2-R_unix_socket_2-R_Ecall_Enclave-Enclave_Step2-Init_Enclave-KMS_Step1-KMS_Step2-KMS_Step3-TLS_Send_Recv-Enclave_Step3-Enclave_Step4-Init_Enclave-Init_Enclave-Daemon_Step2-Enclave_Step6-R_Ocall_Enclave-R_unix_socket_1-R_unix_socket_1-R_unix_socket_1-R_unix_socket_1-R_unix_socket_1-R_unix_socket_1-R_unix_socket_1-Enclave_Step1-TLS_Send_Recv-R_unix_socket_1-Enclave_Step1-TLS_Send_Recv-R_unix_socket_1-TLS_Send_Recv-R_unix_socket_1-Enclave_Step1-Enclave_Step1-Enclave_Step5-R_unix_socket_1" {
+nodesep="0.3";
+ranksep="0.3";
+node[fontsize="8",fontname="Helvetica",width="0.3",height="0.2"];
+edge[fontsize="8",fontname="Helvetica"];
+n5[shape="record",label="{{<n0> !KMS_start( )|<n1> KMS_step1( ~sid, ~nonce, pk(~sk), ~pcr_tcb, H2 )}|{<n2> #a : KMS_Step1[KMSIssuedNonce( ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step1( )]\l}|{<n3> TLS_Send( 'KMS', 'Enclave',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'nonce', ~sid, ~nonce\>\l)\l|<n4> KMS_step2( ~sid, ~nonce, pk(~sk),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~pcr_tcb, H2\l)\l}}",fillcolor="#d5d897",style="filled",fontcolor="black",role="Undefined"];
+n12[shape="record",label="{{<n6> !Enclave_start( )|<n7> Enclave_step1( \<'config', pk(~sk), \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~pcr_tcb, h(HO9), %1, ~key\>\l)\l|<n8> TLS_Recv( 'KMS', 'Enclave',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'nonce', ~sid, ~nonce\>\l)\l}|{<n9> #b : Enclave_Step1[Enclave_Recv_Nonce( ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step2( )]\l}|{<n10> Enclave_step2( ~sid, ~nonce,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'config', pk(~sk), ~pcr_tcb, h(HO9), %1, ~key\>\l)\l|<n11> Ocall_enclave( ~nonce\l)\l}}",fillcolor="#d4d897",style="filled",fontcolor="black",role="Undefined"];
+n19[shape="record",label="{{<n13> !Host_start( )|<n14> Host_step1( HO6, h(HO6) )|<n15> !PID_app( ~pid_app )|<n16> Ocall_host( ~nonce )}|{<n17> #c : Host_Step1[Host_Recv_Nonce( ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step3( )]\l}|{<n18> Host_step2( ~nonce, ~pid_app, HO6, h(HO6) )}}",fillcolor="#a3dd9b",style="filled",fontcolor="black",role="Undefined"];
+n25[shape="record",label="{{<n20> Host_step2( ~nonce, PI6, HO5, h(HO5) )|<n21> !PID_daemon( PI8 )}|{<n22> #d : Host_Step2[Attest_request_Host_To_Daemon( ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UDS_Host_to_Daemon( PI6, PI8 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step4( )]\l}|{<n23> Unix_Socket_Send_via_Host( PI6, PI8,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<AT1, ~nonce\>\l)\l|<n24> Host_step3( ~nonce, PI6, PI8, HO5,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;h(HO5)\l)\l}}",fillcolor="#a4dd9b",style="filled",fontcolor="black",role="Undefined"];
+n33[shape="record",label="{{<n26> !Daemon_start( )|<n27> Daemon_step1( )|<n28> Unix_Socket_Recv_via_Host( PI7,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pid_app.2, \<AT1, ~nonce\>\l)\l|<n29> !HostCode( HO7 )|<n30> !SealingKey( ~seal_key\l)\l}|{<n31> #e : Daemon_Step1[Attest_request_Recv_Daemon( ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DaemonSealkey( ~seal_key ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UDS_Recv_Daemon_from_Host( pid_app.2, PI7 )]\l}|{<n32> Daemon_step2( ~nonce, PI7, pid_app.2, h(HO7), ~seal_key )}}",fillcolor="#b5db99",style="filled",fontcolor="black",role="Undefined"];
+n41[shape="record",label="{{<n34> Daemon_step2( ~nonce, PI3, pid_app.3,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;H2, ~seal_key\l)\l|<n35> !TPM( 'ak_sk', ~sk )|<n36> !TPM( 'pcr_tcb',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~pcr_tcb\l)\l|<n37> TPM_counter( 'init',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%1\l)\l}|{<n38> #f : Daemon_Step2[CreateEvidences( SI1, ~pcr_tcb, H2, ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CreateRuntimeEvidence( H1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CreateSignCounter( SI2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IncrementCounter( %1, (%1%+%1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UDS_Daemon_to_Host( pid_app.3, PI3 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step6( )]\l}|{<n39> Unix_Socket_Send_via_Host( PI3, pid_app.3,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<RE1, \<'quote', ~pcr_tcb, SI1\>, \<'counter', (%1%+%1), SI2\>, HO15, H2, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;H1\>\l)\l|<n40> TPM_counter( 'inc',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(%1%+%1)\l)\l}}",fillcolor="#d1d897",style="filled",fontcolor="black",role="Undefined"];
+n46[shape="record",label="{{<n42> Host_step3( ~nonce,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PI2, PI1, HO2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;h(HO2)\l)\l|<n43> Unix_Socket_Recv_via_Host( PI2, PI1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<RE1, \<'quote', ~pcr_tcb, SI1\>, \<'counter', %x, sig_counter\>, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HO15, H2, host_hash_sealkey_recv\>\l)\l}|{<n44> #g : Host_Step3[Recv_quote_Host( SI1, ~pcr_tcb, H2, ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UDS_Recv_Host_from_Daemon( PI2, PI1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step7( )]\l}|{<n45> Ecall_host( \<'ecall', PI2, PI1, RE1, \<'quote', ~pcr_tcb, SI1\>, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'counter', %x, sig_counter\>, HO15, H2, host_hash_sealkey_recv\>\l)\l}}",fillcolor="#d0d897",style="filled",fontcolor="black",role="Undefined"];
+n52[shape="record",label="{{<n47> Enclave_step3( ~sid, ~nonce, ~pcr_tcb, SI1, (%1%+%1), SI2, H2, H1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'config', pk(~sk), ~pcr_tcb, h(HO9), %1, ~key\>\l)\l|<n48> !SealingKey( ~seal_key\l)\l}|{<n49> #i : Enclave_Step3[Eq( H1, H1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( true, true ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( (%1%+%1), (%1%+%1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EnclaveVerified( H1, SI2, pk(~sk) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EnclaveSignVerified( SI2, pk(~sk) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EnclaveCounterRecv( %1, (%1%+%1), pk(~sk) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EnclaveSealkey( ~seal_key )]\l}|{<n50> Enclave_step4( (%1%+%1),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'config', pk(~sk), ~pcr_tcb, h(HO9), \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%1, ~key\>\l)\l|<n51> TLS_Send( 'Enclave', 'KMS',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<~sid, \<'quote', ~pcr_tcb, SI1\>, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'host_hash', H2, H3\>\l)\l}}",fillcolor="#d0d897",style="filled",fontcolor="black",role="Undefined"];
+n57[shape="record",label="{{<n53> Enclave_step2( ~sid, ~nonce,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'config', pk(~sk), ~pcr_tcb, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;h(HO9), %1, ~key\>\l)\l|<n54> Ecall_enclave( \<'ecall', pid_app.5, pid_daemon.4, RE1, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'quote', ~pcr_tcb, SI1\>, \<'counter', (%1%+%1), SI2\>, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HO15, H2, H1\>\l)\l}|{<n55> #i0 : Enclave_Step2[EnclaveRecvEvidences( ~pcr_tcb, SI1, (%1%+%1), SI2, H2, H1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step8( )]\l}|{<n56> Enclave_step3( ~sid, ~nonce, ~pcr_tcb, SI1, (%1%+%1), SI2, H2, H1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'config', pk(~sk), ~pcr_tcb, h(HO9), %1, ~key\>\l)\l}}",fillcolor="#cfd897",style="filled",fontcolor="black",role="Undefined"];
+n61[shape="record",label="{{<n58> KMS_step3( ~sid, ~nonce, pk(~sk), ~pcr_tcb, H2, ~pcr_tcb, SI1, H2, H3 )}|{<n59> #j : KMS_Step3[Eq( H3, H3 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( true, true ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( ~pcr_tcb, ~pcr_tcb ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KMSVerified( SI1, ~pcr_tcb, H2, ~nonce, pk(~sk) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KMSSignVerified( SI1, pk(~sk) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step11( )]\l}|{<n60> KMS_step4( ~sid, ~nonce, pk(~sk), ~pcr_tcb, H2 )}}",fillcolor="#ced997",style="filled",fontcolor="black",role="Undefined"];
+n66[shape="record",label="{{<n62> KMS_step2( ~sid, ~nonce,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pk(~sk), ~pcr_tcb, H2\l)\l|<n63> TLS_Recv( 'Enclave', 'KMS',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<~sid, \<'quote', ~pcr_tcb, SI1\>, 'host_hash', H2, H3\>\l)\l}|{<n64> #j0 : KMS_Step2[KMSRecvEvidences( ~pcr_tcb, H2, ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step10( )]\l}|{<n65> KMS_step3( ~sid, ~nonce, pk(~sk), ~pcr_tcb, H2, ~pcr_tcb, SI1, H2, H3 )}}",fillcolor="#cdd997",style="filled",fontcolor="black",role="Undefined"];
+n71[shape="record",label="{{<n67> KMS_step4( ~sid, ~nonce, pk(~sk), ~pcr_tcb, H2 )|<n68> Fr( ~new_key )}|{<n69> #k : KMS_Step4[KMSSendAccept( ~pcr_tcb, H2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step12( )]\l}|{<n70> TLS_Send( 'KMS', 'Enclave', \<'accpet', ~sid, H2, ~pcr_tcb, ~new_key\> )}}",fillcolor="#cdd998",style="filled",fontcolor="black",role="Undefined"];
+n76[shape="record",label="{{<n72> TLS_Recv( 'KMS', 'Enclave',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'accpet', ~sid, H2, ~pcr_tcb, ~new_key\>\l)\l|<n73> Enclave_step4( (%1%+%1),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'config', pk(~sk), ~pcr_tcb, h(HO9), %1, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~key\>\l)\l}|{<n74> #l : Enclave_Step4[EnclaveRecvAccept( ~pcr_tcb, H2, (%1%+%1), ~new_key ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step13( )]\l}|{<n75> Enclave_step5( \<'config', pk(~sk), ~pcr_tcb, H2, (%1%+%1), ~new_key\> )}}",fillcolor="#ccd998",style="filled",fontcolor="black",role="Undefined"];
+n81[shape="record",label="{{<n77> Enclave_step5( \<'config', pk(~sk), ~pcr_tcb, H2, (%1%+%1), ~new_key\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\>\l)\l|<n78> !SealingKey( ~seal_key\l)\l}|{<n79> #m : Enclave_Step5[Store( pk(~sk), ~pcr_tcb, H2, (%1%+%1), ~new_key ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step14( )]\l}|{<n80> Out( \<'sealing', SE1\> )}}",fillcolor="#cbd998",style="filled",fontcolor="black",role="Undefined"];
+n87[shape="record",label="{{<n82> In( \<'sealing', SE1\> )|<n83> !SealingKey( ~seal_key )|<n84> TPM_counter( 'inc', (%1%+%1) )}|{<n85> #n : Enclave_Step6[Eq( (%1%+%1), (%1%+%1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CounterVerified( (%1%+%1), (%1%+%1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LoadSealedState( pk(~sk), ~pcr_tcb, H2, (%1%+%1), ~new_key ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step15( )]\l}|{<n86> Enclave_step6( \<'config', pk(~sk), ~pcr_tcb, H2, (%1%+%1), ~new_key\> )}}",fillcolor="#cbd998",style="filled",fontcolor="black",role="Undefined"];
+n91[shape="record",label="{{<n88> Enclave_step6( \<'config', pk(~sk), ~pcr_tcb, H2, (%1%+%1), ~new_key\> )}|{<n89> #o : Enclave_Step7[EnclaveCommit( ~pcr_tcb, H2, (%1%+%1), ~new_key ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step16( )]\l}|{<n90> Enclave_Running( \<'config', pk(~sk), ~pcr_tcb, H2, (%1%+%1), ~new_key\> )}}",fillcolor="#cad998",style="filled",fontcolor="black",role="Undefined"];
+n92[label="#vk : coerce[!KU( ~nonce )]",shape="ellipse"];
+n93[label="#vl : irecv",shape="ellipse"];
+n102[shape="record",label="{{<n94> Fr( ~nonce.1 )|<n95> Fr( ~sid.1 )|<n96> !TPM( 'ak_pk',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pk(~sk)\l)\l|<n97> !TPM( 'pcr_tcb',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~pcr_tcb\l)\l|<n98> !HostCodeHash( h(HO8)\l)\l}|{<n99> #vr : Init_KMS}|{<n100> !KMS_start( )|<n101> KMS_step1( ~sid.1, ~nonce.1, pk(~sk), ~pcr_tcb, h(HO8) )}}",fillcolor="#c4da98",style="filled",fontcolor="black",role="Undefined"];
+n103[label="#vf.1 : isend",shape="ellipse"];
+n104[label="#vk.1 : coerce[!KU( PI1 )]",shape="ellipse"];
+n111[shape="record",label="{{<n105> Fr( ~sk )|<n106> Fr( ~pcr_tcb )}|{<n107> #vr.1 : TPM_Init[Once( 'deloyment' )]}|{<n108> !TPM( 'ak_sk', ~sk )|<n109> !TPM( 'ak_pk', pk(~sk) )|<n110> !TPM( 'pcr_tcb', ~pcr_tcb )}}",fillcolor="#c7d998",style="filled",fontcolor="black",role="Undefined"];
+n112[label="#vk.2 : coerce[!KU( PI2 )]",shape="ellipse"];
+n119[shape="record",label="{{<n113> Fr( HO8 )}|{<n114> #vr.2 : Init_Host}|{<n115> !Host_start( )|<n116> !HostCode( HO8 )|<n117> !HostCodeHash( h(HO8) )|<n118> Host_step1( HO8, h(HO8) )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n120[label="#vk.3 : coerce[!KU( ~pcr_tcb )]",shape="ellipse"];
+n121[label="#vl.3 : irecv",shape="ellipse"];
+n130[shape="record",label="{{<n122> Fr( ~nonce )|<n123> Fr( ~sid )|<n124> !TPM( 'ak_pk', pk(~sk)\l)\l|<n125> !TPM( 'pcr_tcb', ~pcr_tcb\l)\l|<n126> !HostCodeHash( H2 )}|{<n127> #vr.3 : Init_KMS}|{<n128> !KMS_start( )|<n129> KMS_step1( ~sid, ~nonce, pk(~sk), ~pcr_tcb, H2 )}}",fillcolor="#c4da98",style="filled",fontcolor="black",role="Undefined"];
+n131[label="#vk.4 : coerce[!KU( SI2 )]",shape="ellipse"];
+n132[label="#vl.4 : irecv",shape="ellipse"];
+n139[shape="record",label="{{<n133> Fr( HO1 )}|{<n134> #vr.4 : Init_Host}|{<n135> !Host_start( )|<n136> !HostCode( HO1 )|<n137> !HostCodeHash( H2 )|<n138> Host_step1( HO1, H2 )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n140[label="#vk.5 : coerce[!KU( H1 )]",shape="ellipse"];
+n151[shape="record",label="{{<n141> !TPM( 'ak_pk',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pk(~sk)\l)\l|<n142> !TPM( 'pcr_tcb',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~pcr_tcb\l)\l|<n143> !HostCodeHash( h(HO9)\l)\l|<n144> Init_Counter( %1 )|<n145> Fr( ~seal_key )|<n146> Fr( ~key )}|{<n147> #vr.5 : Init_Enclave[SealKeyCreated( ~seal_key )]}|{<n148> !SealingKey( ~seal_key\l)\l|<n149> !Enclave_start( )|<n150> Enclave_step1( \<'config', pk(~sk), ~pcr_tcb, h(HO9), \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%1, ~key\>\l)\l}}",fillcolor="#c2da98",style="filled",fontcolor="black",role="Undefined"];
+n152[label="#vk.6 : coerce[!KU( SI1 )]",shape="ellipse"];
+n159[shape="record",label="{{<n153> Fr( HO9 )}|{<n154> #vr.6 : Init_Host}|{<n155> !Host_start( )|<n156> !HostCode( HO9 )|<n157> !HostCodeHash( h(HO9) )|<n158> Host_step1( HO9, h(HO9) )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n160[label="#vk.7 : coerce[!KU( SE1 )]",shape="ellipse"];
+n165[shape="record",label="{{<n161> #vr.7 : Init_Counter[Once( 'init_counter' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value( %1 )]\l}|{<n162> !TPMCounter_start( )|<n163> TPM_counter( 'init', %1 )|<n164> Init_Counter( %1 )}}",fillcolor="#c1da98",style="filled",fontcolor="black",role="Undefined"];
+n166[label="#vk.8 : coerce[!KU( H2 )]",shape="ellipse"];
+n170[shape="record",label="{{<n167> TLS_Send( 'KMS', 'Enclave', \<'nonce', ~sid, ~nonce\> )}|{<n168> #vr.8 : TLS_Send_Recv[TLS_Record( 'KMS', 'Enclave', \<'nonce', ~sid, ~nonce\> )]}|{<n169> TLS_Recv( 'KMS', 'Enclave', \<'nonce', ~sid, ~nonce\> )}}",fillcolor="#9fde9b",style="filled",fontcolor="black",role="Undefined"];
+n177[shape="record",label="{{<n171> Fr( HO12 )}|{<n172> #vr.9 : Init_Host}|{<n173> !Host_start( )|<n174> !HostCode( HO12 )|<n175> !HostCodeHash( h(HO12) )|<n176> Host_step1( HO12, h(HO12) )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n184[shape="record",label="{{<n178> Fr( HO6 )}|{<n179> #vr.10 : Init_Host}|{<n180> !Host_start( )|<n181> !HostCode( HO6 )|<n182> !HostCodeHash( h(HO6) )|<n183> Host_step1( HO6, h(HO6) )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n188[shape="record",label="{{<n185> In( \<'ocall', ~nonce\> )}|{<n186> #vr.12 : R_Ocall_Host}|{<n187> Ocall_host( ~nonce )}}",fillcolor="#a0dd9b",style="filled",fontcolor="black",role="Undefined"];
+n195[shape="record",label="{{<n189> !Host_start( )|<n190> Host_step1( HO5, h(HO5) )|<n191> !PID_app( PI6 )|<n192> Ocall_host( ~nonce )}|{<n193> #vr.13 : Host_Step1[Host_Recv_Nonce( ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step3( )]\l}|{<n194> Host_step2( ~nonce, PI6, HO5, h(HO5) )}}",fillcolor="#a3dd9b",style="filled",fontcolor="black",role="Undefined"];
+n202[shape="record",label="{{<n196> Fr( HO13 )}|{<n197> #vr.14 : Init_Host}|{<n198> !Host_start( )|<n199> !HostCode( HO13 )|<n200> !HostCodeHash( h(HO13) )|<n201> Host_step1( HO13, h(HO13) )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n209[shape="record",label="{{<n203> Fr( HO5 )}|{<n204> #vr.15 : Init_Host}|{<n205> !Host_start( )|<n206> !HostCode( HO5 )|<n207> !HostCodeHash( h(HO5) )|<n208> Host_step1( HO5, h(HO5) )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n210[label="#vf.16 : isend",shape="ellipse"];
+n214[shape="record",label="{{<n211> In( \<'ocall', ~nonce\> )}|{<n212> #vr.17 : R_Ocall_Host}|{<n213> Ocall_host( ~nonce )}}",fillcolor="#a0dd9b",style="filled",fontcolor="black",role="Undefined"];
+n219[shape="record",label="{{<n215> Fr( ~pid_daemon.6 )}|{<n216> #vr.19 : Init_Daemon}|{<n217> !Daemon_start( )|<n218> Daemon_step1( )}}",fillcolor="#b4db99",style="filled",fontcolor="black",role="Undefined"];
+n220[label="#vf.20 : isend",shape="ellipse"];
+n225[shape="record",label="{{<n221> Fr( ~pid_daemon.7 )}|{<n222> #vr.20 : Init_Daemon}|{<n223> !Daemon_start( )|<n224> Daemon_step1( )}}",fillcolor="#b4db99",style="filled",fontcolor="black",role="Undefined"];
+n229[shape="record",label="{{<n226> In( \<pid_app.2, PI7, AT1, ~nonce\> )}|{<n227> #vr.21 : R_unix_socket_2}|{<n228> Unix_Socket_Recv_via_Host( PI7, pid_app.2, \<AT1, ~nonce\> )}}",fillcolor="#addc9a",style="filled",fontcolor="black",role="Undefined"];
+n236[shape="record",label="{{<n230> Fr( HO7 )}|{<n231> #vr.22 : Init_Host}|{<n232> !Host_start( )|<n233> !HostCode( HO7 )|<n234> !HostCodeHash( h(HO7) )|<n235> Host_step1( HO7, h(HO7) )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n244[shape="record",label="{{<n237> !Daemon_start( )|<n238> Daemon_step1( )|<n239> Unix_Socket_Recv_via_Host( PI3,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pid_app.3, \<AT1, ~nonce\>\l)\l|<n240> !HostCode( HO1 )|<n241> !SealingKey( ~seal_key\l)\l}|{<n242> #vr.23 : Daemon_Step1[Attest_request_Recv_Daemon( ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DaemonSealkey( ~seal_key ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UDS_Recv_Daemon_from_Host( pid_app.3, PI3 )]\l}|{<n243> Daemon_step2( ~nonce, PI3, pid_app.3, H2, ~seal_key )}}",fillcolor="#b5db99",style="filled",fontcolor="black",role="Undefined"];
+n245[label="#vf.24 : isend",shape="ellipse"];
+n250[shape="record",label="{{<n246> Fr( ~pid_daemon.8 )}|{<n247> #vr.24 : Init_Daemon}|{<n248> !Daemon_start( )|<n249> Daemon_step1( )}}",fillcolor="#b4db99",style="filled",fontcolor="black",role="Undefined"];
+n255[shape="record",label="{{<n251> Fr( ~pid_daemon.9 )}|{<n252> #vr.25 : Init_Daemon}|{<n253> !Daemon_start( )|<n254> Daemon_step1( )}}",fillcolor="#b4db99",style="filled",fontcolor="black",role="Undefined"];
+n259[shape="record",label="{{<n256> In( \<pid_app.3, PI3, AT1, ~nonce\> )}|{<n257> #vr.26 : R_unix_socket_2}|{<n258> Unix_Socket_Recv_via_Host( PI3, pid_app.3, \<AT1, ~nonce\> )}}",fillcolor="#addc9a",style="filled",fontcolor="black",role="Undefined"];
+n265[shape="record",label="{{<n260> Host_step2( ~nonce, PI2, HO2, h(HO2) )|<n261> !PID_daemon( PI1 )}|{<n262> #vr.27 : Host_Step2[Attest_request_Host_To_Daemon( ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UDS_Host_to_Daemon( PI2, PI1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step4( )]\l}|{<n263> Unix_Socket_Send_via_Host( PI2, PI1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<AT1, ~nonce\>\l)\l|<n264> Host_step3( ~nonce, PI2, PI1, HO2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;h(HO2)\l)\l}}",fillcolor="#a4dd9b",style="filled",fontcolor="black",role="Undefined"];
+n266[label="#vf.28 : isend",shape="ellipse"];
+n273[shape="record",label="{{<n267> !Host_start( )|<n268> Host_step1( HO2, h(HO2) )|<n269> !PID_app( PI2 )|<n270> Ocall_host( ~nonce )}|{<n271> #vr.28 : Host_Step1[Host_Recv_Nonce( ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step3( )]\l}|{<n272> Host_step2( ~nonce, PI2, HO2, h(HO2) )}}",fillcolor="#a3dd9b",style="filled",fontcolor="black",role="Undefined"];
+n277[shape="record",label="{{<n274> Fr( PI1 )}|{<n275> #vr.29 : Init_Process_Daemon}|{<n276> !PID_daemon( PI1 )}}",fillcolor="#a3dd9b",style="filled",fontcolor="black",role="Undefined"];
+n284[shape="record",label="{{<n278> Fr( HO14 )}|{<n279> #vr.30 : Init_Host}|{<n280> !Host_start( )|<n281> !HostCode( HO14 )|<n282> !HostCodeHash( h(HO14) )|<n283> Host_step1( HO14, h(HO14) )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n291[shape="record",label="{{<n285> Fr( HO2 )}|{<n286> #vr.31 : Init_Host}|{<n287> !Host_start( )|<n288> !HostCode( HO2 )|<n289> !HostCodeHash( h(HO2) )|<n290> Host_step1( HO2, h(HO2) )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n295[shape="record",label="{{<n292> Fr( PI2 )}|{<n293> #vr.32 : Init_Process_Application}|{<n294> !PID_app( PI2 )}}",fillcolor="#a6dd9a",style="filled",fontcolor="black",role="Undefined"];
+n296[label="#vf.33 : isend",shape="ellipse"];
+n300[shape="record",label="{{<n297> In( \<'ocall', ~nonce\> )}|{<n298> #vr.33 : R_Ocall_Host}|{<n299> Ocall_host( ~nonce )}}",fillcolor="#a0dd9b",style="filled",fontcolor="black",role="Undefined"];
+n301[label="#vf.34 : isend",shape="ellipse"];
+n305[shape="record",label="{{<n302> In( \<PI1, PI2, RE1, \<'quote', ~pcr_tcb, SI1\>, \<'counter', %x, sig_counter\>, HO15, H2, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;host_hash_sealkey_recv\>\l)\l}|{<n303> #vr.34 : R_unix_socket_2}|{<n304> Unix_Socket_Recv_via_Host( PI2, PI1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<RE1, \<'quote', ~pcr_tcb, SI1\>, \<'counter', %x, sig_counter\>, HO15, H2, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;host_hash_sealkey_recv\>\l)\l}}",fillcolor="#addc9a",style="filled",fontcolor="black",role="Undefined"];
+n306[label="#vf.35 : isend",shape="ellipse"];
+n310[shape="record",label="{{<n307> In( \<'ecall', 'ecall', pid_app.5, pid_daemon.4, RE1, \<'quote', ~pcr_tcb, SI1\>, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'counter', (%1%+%1), SI2\>, HO15, H2, H1\>\l)\l}|{<n308> #vr.35 : R_Ecall_Enclave}|{<n309> Ecall_enclave( \<'ecall', pid_app.5, pid_daemon.4, RE1, \<'quote', ~pcr_tcb, SI1\>, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'counter', (%1%+%1), SI2\>, HO15, H2, H1\>\l)\l}}",fillcolor="#acdc9a",style="filled",fontcolor="black",role="Undefined"];
+n314[shape="record",label="{{<n311> TLS_Send( 'KMS', 'Enclave', \<'accpet', ~sid, H2, ~pcr_tcb, ~new_key\> )}|{<n312> #vr.36 : TLS_Send_Recv[TLS_Record( 'KMS', 'Enclave',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'accpet', ~sid, H2, ~pcr_tcb, ~new_key\>\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)]\l}|{<n313> TLS_Recv( 'KMS', 'Enclave', \<'accpet', ~sid, H2, ~pcr_tcb, ~new_key\> )}}",fillcolor="#9fde9b",style="filled",fontcolor="black",role="Undefined"];
+n315[label="#vf.39 : isend",shape="ellipse"];
+n321[shape="record",label="{{<n316> Host_step2( msg, PI4, HO3, h(HO3) )|<n317> !PID_daemon( PI1 )}|{<n318> #vr.42 : Host_Step2[Attest_request_Host_To_Daemon( msg ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UDS_Host_to_Daemon( PI4, PI1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step4( )]\l}|{<n319> Unix_Socket_Send_via_Host( PI4, PI1, \<AT1, msg\> )|<n320> Host_step3( msg, PI4, PI1, HO3, h(HO3)\l)\l}}",fillcolor="#a4dd9b",style="filled",fontcolor="black",role="Undefined"];
+n322[label="#vf.43 : isend",shape="ellipse"];
+n329[shape="record",label="{{<n323> !Host_start( )|<n324> Host_step1( HO3, h(HO3) )|<n325> !PID_app( PI4 )|<n326> Ocall_host( msg )}|{<n327> #vr.43 : Host_Step1[Host_Recv_Nonce( msg ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step3( )]\l}|{<n328> Host_step2( msg, PI4, HO3, h(HO3) )}}",fillcolor="#a3dd9b",style="filled",fontcolor="black",role="Undefined"];
+n336[shape="record",label="{{<n330> Fr( HO10 )}|{<n331> #vr.44 : Init_Host}|{<n332> !Host_start( )|<n333> !HostCode( HO10 )|<n334> !HostCodeHash( h(HO10) )|<n335> Host_step1( HO10, h(HO10) )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n343[shape="record",label="{{<n337> Fr( HO3 )}|{<n338> #vr.45 : Init_Host}|{<n339> !Host_start( )|<n340> !HostCode( HO3 )|<n341> !HostCodeHash( h(HO3) )|<n342> Host_step1( HO3, h(HO3) )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n347[shape="record",label="{{<n344> Fr( PI4 )}|{<n345> #vr.46 : Init_Process_Application}|{<n346> !PID_app( PI4 )}}",fillcolor="#a6dd9a",style="filled",fontcolor="black",role="Undefined"];
+n353[shape="record",label="{{<n348> Host_step2( msg.1, PI2, HO4, h(HO4) )|<n349> !PID_daemon( PI5 )}|{<n350> #vr.50 : Host_Step2[Attest_request_Host_To_Daemon( msg.1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UDS_Host_to_Daemon( PI2, PI5 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step4( )]\l}|{<n351> Unix_Socket_Send_via_Host( PI2, PI5, \<AT1, msg.1\>\l)\l|<n352> Host_step3( msg.1, PI2, PI5, HO4,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;h(HO4)\l)\l}}",fillcolor="#a4dd9b",style="filled",fontcolor="black",role="Undefined"];
+n360[shape="record",label="{{<n354> !Host_start( )|<n355> Host_step1( HO4, h(HO4) )|<n356> !PID_app( PI2 )|<n357> Ocall_host( msg.1 )}|{<n358> #vr.51 : Host_Step1[Host_Recv_Nonce( msg.1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step3( )]\l}|{<n359> Host_step2( msg.1, PI2, HO4, h(HO4) )}}",fillcolor="#a3dd9b",style="filled",fontcolor="black",role="Undefined"];
+n364[shape="record",label="{{<n361> Fr( PI5 )}|{<n362> #vr.52 : Init_Process_Daemon}|{<n363> !PID_daemon( PI5 )}}",fillcolor="#a3dd9b",style="filled",fontcolor="black",role="Undefined"];
+n371[shape="record",label="{{<n365> Fr( HO11 )}|{<n366> #vr.53 : Init_Host}|{<n367> !Host_start( )|<n368> !HostCode( HO11 )|<n369> !HostCodeHash( h(HO11) )|<n370> Host_step1( HO11, h(HO11) )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n378[shape="record",label="{{<n372> Fr( HO4 )}|{<n373> #vr.54 : Init_Host}|{<n374> !Host_start( )|<n375> !HostCode( HO4 )|<n376> !HostCodeHash( h(HO4) )|<n377> Host_step1( HO4, h(HO4) )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n382[shape="record",label="{{<n379> Unix_Socket_Send_via_Host( PI3, pid_app.3,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<RE1, \<'quote', ~pcr_tcb, SI1\>, \<'counter', (%1%+%1), SI2\>, HO15, H2, H1\>\l)\l}|{<n380> #vr.56 : R_unix_socket_1}|{<n381> Out( \<PI3, pid_app.3, RE1, \<'quote', ~pcr_tcb, SI1\>, \<'counter', (%1%+%1), SI2\>, HO15, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;H2, H1\>\l)\l}}",fillcolor="#a0dd9b",style="filled",fontcolor="black",role="Undefined"];
+n383[label="#vr.57 : d_0_snd",shape="ellipse"];
+n384[label="#vr.58 : d_0_snd",shape="ellipse"];
+n385[label="#vr.59 : d_0_snd",shape="ellipse"];
+n386[label="#vr.60 : d_0_fst",shape="ellipse"];
+n387[label="#vr.61 : d_0_snd",shape="ellipse"];
+n388[label="#vr.62 : d_0_fst",shape="ellipse"];
+n389[label="#vr.63 : d_0_snd",shape="ellipse"];
+n390[label="#vr.64 : d_0_fst",shape="ellipse"];
+n391[label="#vr.65 : d_0_snd",shape="ellipse"];
+n392[label="#vr.66 : d_0_snd",shape="ellipse"];
+n393[label="#vr.67 : d_0_snd",shape="ellipse"];
+n394[label="#vr.68 : d_0_snd",shape="ellipse"];
+n395[label="#vr.69 : d_0_snd",shape="ellipse"];
+n399[shape="record",label="{{<n396> TLS_Send( 'Enclave', 'KMS', \<~sid, \<'quote', ~pcr_tcb, SI1\>, 'host_hash', H2, H3\> )}|{<n397> #vr.70 : TLS_Send_Recv[TLS_Record( 'Enclave', 'KMS',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<~sid, \<'quote', ~pcr_tcb, SI1\>, 'host_hash', H2, H3\>\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)]\l}|{<n398> TLS_Recv( 'Enclave', 'KMS', \<~sid, \<'quote', ~pcr_tcb, SI1\>, 'host_hash', H2, H3\> )}}",fillcolor="#9fde9b",style="filled",fontcolor="black",role="Undefined"];
+n400[label="#vr.71 : d_0_snd",shape="ellipse"];
+n401[label="#vr.73 : d_0_fst",shape="ellipse"];
+n402[label="!KU( pid_app.2 ) @ #vk.37",shape="ellipse",color="gray"];
+n403[label="!KU( PI7 ) @ #vk.38",shape="ellipse",color="gray"];
+n404[label="!KU( pid_app.3 ) @ #vk.40",shape="ellipse",color="gray"];
+n405[label="!KU( PI3 ) @ #vk.41",shape="ellipse",color="gray"];
+n406[label="!KU( sig_counter ) @ #vk.49",shape="ellipse",color="gray"];
+n407[label="!KU( host_hash_sealkey_recv ) @ #vk.53",shape="ellipse",color="gray"];
+n408[label="!KU( pid_app.5 ) @ #vk.55",shape="ellipse",color="gray"];
+n409[label="!KU( pid_daemon.4 ) @ #vk.56",shape="ellipse",color="gray"];
+n410[label="!KU( msg ) @ #vk.58",shape="ellipse",color="gray"];
+n411[label="!KU( msg.1 ) @ #vk.59",shape="ellipse",color="gray"];
+n5:n3 -> n170:n167[style="bold",weight="10.0"];
+n5:n4 -> n66:n62[style="bold",weight="10.0"];
+n12:n10 -> n57:n53[style="bold",weight="10.0"];
+n12:n11 -> n93[style="bold",weight="10.0"];
+n41:n39 -> n382:n379[style="bold",weight="10.0"];
+n41:n40 -> n87:n84[style="bold",weight="10.0"];
+n52:n50 -> n76:n73[style="bold",weight="10.0"];
+n52:n51 -> n399:n396[style="bold",weight="10.0"];
+n57:n56 -> n52:n47[style="bold",weight="10.0"];
+n61:n60 -> n71:n67[style="bold",weight="10.0"];
+n66:n65 -> n61:n58[style="bold",weight="10.0"];
+n71:n70 -> n314:n311[style="bold",weight="10.0"];
+n76:n75 -> n81:n77[style="bold",weight="10.0"];
+n81:n80 -> n132[color="gray30"];
+n87:n86 -> n91:n88[style="bold",weight="10.0"];
+n93 -> n92[color="orangered2"];
+n102:n100 -> n5:n0[style="bold",weight="10.0",color="gray50"];
+n103 -> n87:n82[color="gray30"];
+n111:n108 -> n41:n35[style="bold",weight="10.0",color="gray50"];
+n111:n109 -> n102:n96[style="bold",weight="10.0",color="gray50"];
+n111:n109 -> n130:n124[style="bold",weight="10.0",color="gray50"];
+n111:n109 -> n151:n141[style="bold",weight="10.0",color="gray50"];
+n111:n110 -> n41:n36[style="bold",weight="10.0",color="gray50"];
+n111:n110 -> n102:n97[style="bold",weight="10.0",color="gray50"];
+n111:n110 -> n130:n125[style="bold",weight="10.0",color="gray50"];
+n111:n110 -> n151:n142[style="bold",weight="10.0",color="gray50"];
+n119:n117 -> n102:n98[style="bold",weight="10.0",color="gray50"];
+n121 -> n383[color="orangered2"];
+n130:n129 -> n5:n1[style="bold",weight="10.0"];
+n132 -> n160[color="orangered2"];
+n139:n136 -> n244:n240[style="bold",weight="10.0",color="gray50"];
+n139:n137 -> n130:n126[style="bold",weight="10.0",color="gray50"];
+n151:n148 -> n33:n30[style="bold",weight="10.0",color="gray50"];
+n151:n148 -> n52:n48[style="bold",weight="10.0",color="gray50"];
+n151:n148 -> n81:n78[style="bold",weight="10.0",color="gray50"];
+n151:n148 -> n87:n83[style="bold",weight="10.0",color="gray50"];
+n151:n148 -> n244:n241[style="bold",weight="10.0",color="gray50"];
+n151:n149 -> n12:n6[style="bold",weight="10.0",color="gray50"];
+n151:n150 -> n12:n7[style="bold",weight="10.0"];
+n159:n157 -> n151:n143[style="bold",weight="10.0",color="gray50"];
+n165:n163 -> n41:n37[style="bold",weight="10.0"];
+n165:n164 -> n151:n144[style="bold",weight="10.0"];
+n170:n169 -> n12:n8[style="bold",weight="10.0"];
+n177:n173 -> n19:n13[style="bold",weight="10.0",color="gray50"];
+n184:n183 -> n19:n14[style="bold",weight="10.0"];
+n188:n187 -> n19:n16[style="bold",weight="10.0"];
+n195:n194 -> n25:n20[style="bold",weight="10.0"];
+n202:n198 -> n195:n189[style="bold",weight="10.0",color="gray50"];
+n209:n208 -> n195:n190[style="bold",weight="10.0"];
+n210 -> n188:n185[color="gray30"];
+n214:n213 -> n195:n192[style="bold",weight="10.0"];
+n219:n217 -> n33:n26[style="bold",weight="10.0",color="gray50"];
+n220 -> n214:n211[color="gray30"];
+n225:n224 -> n33:n27[style="bold",weight="10.0"];
+n229:n228 -> n33:n28[style="bold",weight="10.0"];
+n236:n233 -> n33:n29[style="bold",weight="10.0",color="gray50"];
+n244:n243 -> n41:n34[style="bold",weight="10.0"];
+n245 -> n229:n226[color="gray30"];
+n250:n248 -> n244:n237[style="bold",weight="10.0",color="gray50"];
+n255:n254 -> n244:n238[style="bold",weight="10.0"];
+n259:n258 -> n244:n239[style="bold",weight="10.0"];
+n265:n264 -> n46:n42[style="bold",weight="10.0"];
+n266 -> n259:n256[color="gray30"];
+n273:n272 -> n265:n260[style="bold",weight="10.0"];
+n277:n276 -> n265:n261[style="bold",weight="10.0",color="gray50"];
+n277:n276 -> n321:n317[style="bold",weight="10.0",color="gray50"];
+n284:n280 -> n273:n267[style="bold",weight="10.0",color="gray50"];
+n291:n290 -> n273:n268[style="bold",weight="10.0"];
+n295:n294 -> n273:n269[style="bold",weight="10.0",color="gray50"];
+n295:n294 -> n360:n356[style="bold",weight="10.0",color="gray50"];
+n296 -> n300:n297[color="gray30"];
+n300:n299 -> n273:n270[style="bold",weight="10.0"];
+n301 -> n305:n302[color="gray30"];
+n305:n304 -> n46:n43[style="bold",weight="10.0"];
+n306 -> n310:n307[color="gray30"];
+n310:n309 -> n57:n54[style="bold",weight="10.0"];
+n314:n313 -> n76:n72[style="bold",weight="10.0"];
+n315 -> n329:n326[style="bold",weight="10.0"];
+n321:n319 -> n104[style="bold",weight="10.0",color="gray50"];
+n322 -> n360:n357[style="bold",weight="10.0"];
+n329:n328 -> n321:n316[style="bold",weight="10.0"];
+n336:n332 -> n329:n323[style="bold",weight="10.0",color="gray50"];
+n343:n342 -> n329:n324[style="bold",weight="10.0"];
+n347:n346 -> n329:n325[style="bold",weight="10.0",color="gray50"];
+n353:n351 -> n112[style="bold",weight="10.0",color="gray50"];
+n360:n359 -> n353:n348[style="bold",weight="10.0"];
+n364:n363 -> n353:n349[style="bold",weight="10.0",color="gray50"];
+n371:n367 -> n360:n354[style="bold",weight="10.0",color="gray50"];
+n378:n377 -> n360:n355[style="bold",weight="10.0"];
+n382:n381 -> n121[color="gray30"];
+n383 -> n384[color="orangered2"];
+n384 -> n385[color="orangered2"];
+n385 -> n386[color="orangered2"];
+n385 -> n389[color="orangered2"];
+n386 -> n387[color="orangered2"];
+n387 -> n388[color="orangered2"];
+n387 -> n400[color="orangered2"];
+n388 -> n120[color="orangered2"];
+n389 -> n390[color="orangered2"];
+n389 -> n393[color="orangered2"];
+n390 -> n391[color="orangered2"];
+n391 -> n392[color="orangered2"];
+n392 -> n131[color="orangered2"];
+n393 -> n394[color="orangered2"];
+n394 -> n395[color="orangered2"];
+n394 -> n401[color="orangered2"];
+n395 -> n140[color="orangered2"];
+n399:n398 -> n66:n63[style="bold",weight="10.0"];
+n400 -> n152[color="orangered2"];
+n401 -> n166[color="orangered2"];
+n12:n9 -> n19:n17[color="black",style="dashed"];
+n19:n17 -> n25:n22[color="black",style="dashed"];
+n25:n22 -> n33:n31[color="black",style="dashed"];
+n33:n31 -> n41:n38[color="black",style="dashed"];
+n41:n38 -> n46:n44[color="black",style="dashed"];
+n46:n44 -> n57:n55[color="black",style="dashed"];
+n92 -> n210[color="red",style="dashed"];
+n92 -> n220[color="red",style="dashed"];
+n92 -> n245[color="red",style="dashed"];
+n92 -> n266[color="red",style="dashed"];
+n92 -> n296[color="red",style="dashed"];
+n93 -> n210[color="red",style="dashed"];
+n93 -> n220[color="red",style="dashed"];
+n93 -> n296[color="red",style="dashed"];
+n104 -> n301[color="red",style="dashed"];
+n112 -> n301[color="red",style="dashed"];
+n120 -> n301[color="red",style="dashed"];
+n120 -> n306[color="red",style="dashed"];
+n131 -> n306[color="red",style="dashed"];
+n140 -> n306[color="red",style="dashed"];
+n152 -> n301[color="red",style="dashed"];
+n152 -> n306[color="red",style="dashed"];
+n160 -> n103[color="red",style="dashed"];
+n166 -> n301[color="red",style="dashed"];
+n166 -> n306[color="red",style="dashed"];
+n402 -> n245[color="red",style="dashed"];
+n403 -> n245[color="red",style="dashed"];
+n404 -> n266[color="red",style="dashed"];
+n405 -> n266[color="red",style="dashed"];
+n406 -> n301[color="red",style="dashed"];
+n407 -> n301[color="red",style="dashed"];
+n408 -> n306[color="red",style="dashed"];
+n409 -> n306[color="red",style="dashed"];
+n410 -> n315[color="red",style="dashed"];
+n384 -> n306[color="red",style="dashed"];
+n411 -> n322[color="red",style="dashed"];
+n385 -> n306[color="red",style="dashed"];
+n386 -> n301[color="red",style="dashed"];
+n386 -> n306[color="red",style="dashed"];
+n387 -> n301[color="red",style="dashed"];
+n387 -> n306[color="red",style="dashed"];
+n389 -> n306[color="red",style="dashed"];
+n390 -> n306[color="red",style="dashed"];
+n391 -> n306[color="red",style="dashed"];
+n393 -> n306[color="red",style="dashed"];
+n394 -> n306[color="red",style="dashed"];
+{
+rank="sink";
+n412[shape="plain",label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="3" CELLPADDING="1"><TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">AT1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'attest_request'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">H2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">h(HO1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">H1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">h(&lt;H2, ~nonce, ~seal_key&gt;)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">H3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">h(&lt;H2, ~nonce&gt;)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO10</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code.10</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO11</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code.12</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO12</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code.7</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO13</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code.8</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO14</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code.9</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO15</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'host_hash_sealkey'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code.5</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code.11</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code.13</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO5</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code.3</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO6</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code.2</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO7</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code.4</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO8</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code.6</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO9</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code.1</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PI1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~pid_daemon.3</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PI2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~pid_app.4</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PI3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">pid_daemon.2</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PI4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~pid_app.6</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PI5</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~pid_daemon.5</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PI6</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~pid_app.1</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PI7</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">pid_daemon.1</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PI8</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~pid_daemon</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">RE1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'return_evidences'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SE1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">senc(&lt;'config', pk(~sk), ~pcr_tcb, H2, (%1%+%1), ~new_key&gt;,<BR ALIGN="LEFT"/> &#32;&#32;&#32;&#32;~seal_key)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SI1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">sign(&lt;'quote', ~pcr_tcb, ~nonce&gt;, ~sk)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SI2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">sign(&lt;'counter', (%1%+%1), ~nonce&gt;, ~sk)</TD></TR></TABLE>>];
+
+}
+n91:n89 -> n412[style="invis"];
+
+}
+
+digraph "trace_Enclave_Integrity_Online_SL2-AS0-CL0-A1-C1-NB_L_cuckoo2-KMS_Step2-TLS_Send_Recv-R_unix_socket_1-R_Ocall_Enclave-R_unix_socket_1-R_unix_socket_1-R_unix_socket_1-Enclave_Step1-R_unix_socket_1" {
+nodesep="0.3";
+ranksep="0.3";
+node[fontsize="8",fontname="Helvetica",width="0.3",height="0.2"];
+edge[fontsize="8",fontname="Helvetica"];
+n3[shape="record",label="{{<n0> KMS_step3( ~sid, ~nonce, pk(~sk), ~pcr_tcb, H2, ~pcr_tcb, SI1, H2, H3 )}|{<n1> #i : KMS_Step3[Eq( H3, H3 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( true, true ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( ~pcr_tcb, ~pcr_tcb ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KMSVerified( SI1, ~pcr_tcb, H2, ~nonce, pk(~sk) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KMSSignVerified( SI1, pk(~sk) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step11( )]\l}|{<n2> KMS_step4( ~sid, ~nonce, pk(~sk), ~pcr_tcb, H2 )}}",fillcolor="#d5d897",style="filled",fontcolor="black",role="Undefined"];
+n4[label="#vk : coerce[!KU( ~pcr_tcb )]",shape="ellipse"];
+n5[label="#vl : irecv",shape="ellipse"];
+n10[shape="record",label="{{<n6> KMS_step2( ~sid, ~nonce,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pk(~sk), ~pcr_tcb, H2\l)\l|<n7> TLS_Recv( 'Enclave', 'KMS',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<~sid, \<'quote', ~pcr_tcb, SI1\>, 'host_hash', H2, H3\>\l)\l}|{<n8> #vr : KMS_Step2[KMSRecvEvidences( ~pcr_tcb, H2, ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step10( )]\l}|{<n9> KMS_step3( ~sid, ~nonce, pk(~sk), ~pcr_tcb, H2, ~pcr_tcb, SI1, H2, H3 )}}",fillcolor="#d0d897",style="filled",fontcolor="black",role="Undefined"];
+n11[label="#vk.1 : coerce[!KU( ~nonce )]",shape="ellipse"];
+n17[shape="record",label="{{<n12> !KMS_start( )|<n13> KMS_step1( ~sid, ~nonce, pk(~sk), ~pcr_tcb, H2 )}|{<n14> #vr.1 : KMS_Step1[KMSIssuedNonce( ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step1( )]\l}|{<n15> TLS_Send( 'KMS', 'Enclave',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'nonce', ~sid, ~nonce\>\l)\l|<n16> KMS_step2( ~sid, ~nonce, pk(~sk),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~pcr_tcb, H2\l)\l}}",fillcolor="#ccd998",style="filled",fontcolor="black",role="Undefined"];
+n18[label="#vk.2 : coerce[!KU( SI1 )]",shape="ellipse"];
+n27[shape="record",label="{{<n19> Fr( ~nonce.1 )|<n20> Fr( ~sid.1 )|<n21> !TPM( 'ak_pk',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pk(~sk)\l)\l|<n22> !TPM( 'pcr_tcb',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~pcr_tcb\l)\l|<n23> !HostCodeHash( h(HO2)\l)\l}|{<n24> #vr.2 : Init_KMS}|{<n25> !KMS_start( )|<n26> KMS_step1( ~sid.1, ~nonce.1, pk(~sk), ~pcr_tcb, h(HO2) )}}",fillcolor="#c8d998",style="filled",fontcolor="black",role="Undefined"];
+n28[label="#vk.3 : coerce[!KU( SI2 )]",shape="ellipse"];
+n37[shape="record",label="{{<n29> Fr( ~nonce )|<n30> Fr( ~sid )|<n31> !TPM( 'ak_pk', pk(~sk)\l)\l|<n32> !TPM( 'pcr_tcb', ~pcr_tcb\l)\l|<n33> !HostCodeHash( H2 )}|{<n34> #vr.3 : Init_KMS}|{<n35> !KMS_start( )|<n36> KMS_step1( ~sid, ~nonce, pk(~sk), ~pcr_tcb, H2 )}}",fillcolor="#c8d998",style="filled",fontcolor="black",role="Undefined"];
+n38[label="#vk.4 : coerce[!KU( H2 )]",shape="ellipse"];
+n45[shape="record",label="{{<n39> Fr( ~sk )|<n40> Fr( ~pcr_tcb )}|{<n41> #vr.4 : TPM_Init[Once( 'deloyment' )]}|{<n42> !TPM( 'ak_sk', ~sk )|<n43> !TPM( 'ak_pk', pk(~sk) )|<n44> !TPM( 'pcr_tcb', ~pcr_tcb )}}",fillcolor="#c6d998",style="filled",fontcolor="black",role="Undefined"];
+n46[label="#vk.5 : coerce[!KU( H1 )]",shape="ellipse"];
+n53[shape="record",label="{{<n47> Fr( HO2 )}|{<n48> #vr.5 : Init_Host}|{<n49> !Host_start( )|<n50> !HostCode( HO2 )|<n51> !HostCodeHash( h(HO2) )|<n52> Host_step1( HO2, h(HO2) )}}",fillcolor="#b6db99",style="filled",fontcolor="black",role="Undefined"];
+n60[shape="record",label="{{<n54> Fr( HO1 )}|{<n55> #vr.6 : Init_Host}|{<n56> !Host_start( )|<n57> !HostCode( HO1 )|<n58> !HostCodeHash( H2 )|<n59> Host_step1( HO1, H2 )}}",fillcolor="#b6db99",style="filled",fontcolor="black",role="Undefined"];
+n64[shape="record",label="{{<n61> TLS_Send( 'Enclave', 'KMS', \<~sid, \<'quote', ~pcr_tcb, SI1\>, 'host_hash', H2, H3\> )}|{<n62> #vr.7 : TLS_Send_Recv[TLS_Record( 'Enclave', 'KMS',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<~sid, \<'quote', ~pcr_tcb, SI1\>, 'host_hash', H2, H3\>\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)]\l}|{<n63> TLS_Recv( 'Enclave', 'KMS', \<~sid, \<'quote', ~pcr_tcb, SI1\>, 'host_hash', H2, H3\> )}}",fillcolor="#a0dd9b",style="filled",fontcolor="black",role="Undefined"];
+n70[shape="record",label="{{<n65> Enclave_step3( ~sid, ~nonce, ~pcr_tcb, SI1, (%1%+%1), SI2, H2, H1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'config', pk(~sk), ~pcr_tcb, h(HO3), %1, ~key\>\l)\l|<n66> !SealingKey( ~seal_key\l)\l}|{<n67> #vr.8 : Enclave_Step3[Eq( H1, H1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( true, true ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( (%1%+%1), (%1%+%1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EnclaveVerified( H1, SI2, pk(~sk) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EnclaveSignVerified( SI2, pk(~sk) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EnclaveCounterRecv( %1, (%1%+%1), pk(~sk) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EnclaveSealkey( ~seal_key )]\l}|{<n68> Enclave_step4( (%1%+%1),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'config', pk(~sk), ~pcr_tcb, h(HO3), \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%1, ~key\>\l)\l|<n69> TLS_Send( 'Enclave', 'KMS',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<~sid, \<'quote', ~pcr_tcb, SI1\>, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'host_hash', H2, H3\>\l)\l}}",fillcolor="#beda99",style="filled",fontcolor="black",role="Undefined"];
+n75[shape="record",label="{{<n71> Enclave_step2( ~sid, ~nonce,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'config', pk(~sk), ~pcr_tcb, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;h(HO3), %1, ~key\>\l)\l|<n72> Ecall_enclave( \<'ecall', pid_app, pid_daemon, RE1, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'quote', ~pcr_tcb, SI1\>, \<'counter', (%1%+%1), SI2\>, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HO4, H2, H1\>\l)\l}|{<n73> #vr.9 : Enclave_Step2[EnclaveRecvEvidences( ~pcr_tcb, SI1, (%1%+%1), SI2, H2, H1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step8( )]\l}|{<n74> Enclave_step3( ~sid, ~nonce, ~pcr_tcb, SI1, (%1%+%1), SI2, H2, H1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'config', pk(~sk), ~pcr_tcb, h(HO3), %1, ~key\>\l)\l}}",fillcolor="#bcda99",style="filled",fontcolor="black",role="Undefined"];
+n76[label="#vf.10 : isend",shape="ellipse"];
+n87[shape="record",label="{{<n77> !TPM( 'ak_pk',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pk(~sk)\l)\l|<n78> !TPM( 'pcr_tcb',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~pcr_tcb\l)\l|<n79> !HostCodeHash( h(HO3)\l)\l|<n80> Init_Counter( %1 )|<n81> Fr( ~seal_key )|<n82> Fr( ~key )}|{<n83> #vr.10 : Init_Enclave[SealKeyCreated( ~seal_key )]}|{<n84> !SealingKey( ~seal_key\l)\l|<n85> !Enclave_start( )|<n86> Enclave_step1( \<'config', pk(~sk), ~pcr_tcb, h(HO3), \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%1, ~key\>\l)\l}}",fillcolor="#badb99",style="filled",fontcolor="black",role="Undefined"];
+n91[shape="record",label="{{<n88> In( \<'ecall', 'ecall', pid_app, pid_daemon, RE1, \<'quote', ~pcr_tcb, SI1\>, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'counter', (%1%+%1), SI2\>, HO4, H2, H1\>\l)\l}|{<n89> #vr.11 : R_Ecall_Enclave}|{<n90> Ecall_enclave( \<'ecall', pid_app, pid_daemon, RE1, \<'quote', ~pcr_tcb, SI1\>, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'counter', (%1%+%1), SI2\>, HO4, H2, H1\>\l)\l}}",fillcolor="#b8db99",style="filled",fontcolor="black",role="Undefined"];
+n98[shape="record",label="{{<n92> Fr( HO3 )}|{<n93> #vr.12 : Init_Host}|{<n94> !Host_start( )|<n95> !HostCode( HO3 )|<n96> !HostCodeHash( h(HO3) )|<n97> Host_step1( HO3, h(HO3) )}}",fillcolor="#b6db99",style="filled",fontcolor="black",role="Undefined"];
+n103[shape="record",label="{{<n99> #vr.13 : Init_Counter[Once( 'init_counter' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Value( %1 )]\l}|{<n100> !TPMCounter_start( )|<n101> TPM_counter( 'init', %1 )|<n102> Init_Counter( %1 )}}",fillcolor="#b3db99",style="filled",fontcolor="black",role="Undefined"];
+n104[label="#vf.14 : isend",shape="ellipse"];
+n108[shape="record",label="{{<n105> Unix_Socket_Send_via_Host( pid_send, pid_recv,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<RE1, \<'quote', ~pcr_tcb, SI1\>, \<'counter', (%1%+%1), SI2\>, HO4, H2, H1\>\l)\l}|{<n106> #vr.14 : R_unix_socket_1}|{<n107> Out( \<pid_send, pid_recv, RE1, \<'quote', ~pcr_tcb, SI1\>, \<'counter', (%1%+%1), SI2\>, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HO4, H2, H1\>\l)\l}}",fillcolor="#b1dc9a",style="filled",fontcolor="black",role="Undefined"];
+n109[label="#vr.15 : d_0_snd",shape="ellipse"];
+n110[label="#vr.16 : d_0_snd",shape="ellipse"];
+n111[label="#vr.17 : d_0_snd",shape="ellipse"];
+n119[shape="record",label="{{<n112> Daemon_step2( ~nonce, pid_send,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pid_recv, H2, ~seal_key\l)\l|<n113> !TPM( 'ak_sk', ~sk )|<n114> !TPM( 'pcr_tcb',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~pcr_tcb\l)\l|<n115> TPM_counter( 'init',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%1\l)\l}|{<n116> #vr.18 : Daemon_Step2[CreateEvidences( SI1, ~pcr_tcb, H2, ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CreateRuntimeEvidence( H1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CreateSignCounter( SI2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IncrementCounter( %1, (%1%+%1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UDS_Daemon_to_Host( pid_recv, pid_send ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step6( )]\l}|{<n117> Unix_Socket_Send_via_Host( pid_send, pid_recv,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<RE1, \<'quote', ~pcr_tcb, SI1\>, \<'counter', (%1%+%1), SI2\>, HO4, H2, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;H1\>\l)\l|<n118> TPM_counter( 'inc',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(%1%+%1)\l)\l}}",fillcolor="#afdc9a",style="filled",fontcolor="black",role="Undefined"];
+n120[label="#vr.19 : d_0_fst",shape="ellipse"];
+n121[label="#vr.20 : d_0_snd",shape="ellipse"];
+n122[label="#vr.21 : d_0_fst",shape="ellipse"];
+n130[shape="record",label="{{<n123> !Daemon_start( )|<n124> Daemon_step1( )|<n125> Unix_Socket_Recv_via_Host( pid_send,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pid_recv, \<AT1, ~nonce\>\l)\l|<n126> !HostCode( HO1 )|<n127> !SealingKey( ~seal_key\l)\l}|{<n128> #vr.22 : Daemon_Step1[Attest_request_Recv_Daemon( ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DaemonSealkey( ~seal_key ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UDS_Recv_Daemon_from_Host( pid_recv, pid_send )]\l}|{<n129> Daemon_step2( ~nonce, pid_send, pid_recv, H2, ~seal_key )}}",fillcolor="#addc9a",style="filled",fontcolor="black",role="Undefined"];
+n135[shape="record",label="{{<n131> Fr( ~pid_daemon.1 )}|{<n132> #vr.23 : Init_Daemon}|{<n133> !Daemon_start( )|<n134> Daemon_step1( )}}",fillcolor="#a9dc9a",style="filled",fontcolor="black",role="Undefined"];
+n140[shape="record",label="{{<n136> Fr( ~pid_daemon.2 )}|{<n137> #vr.24 : Init_Daemon}|{<n138> !Daemon_start( )|<n139> Daemon_step1( )}}",fillcolor="#a9dc9a",style="filled",fontcolor="black",role="Undefined"];
+n144[shape="record",label="{{<n141> In( \<pid_recv, pid_send, AT1, ~nonce\> )}|{<n142> #vr.25 : R_unix_socket_2}|{<n143> Unix_Socket_Recv_via_Host( pid_send, pid_recv, \<AT1, ~nonce\> )}}",fillcolor="#a7dd9a",style="filled",fontcolor="black",role="Undefined"];
+n151[shape="record",label="{{<n145> !Enclave_start( )|<n146> Enclave_step1( \<'config', pk(~sk), \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~pcr_tcb, h(HO3), %1, ~key\>\l)\l|<n147> TLS_Recv( 'KMS', 'Enclave',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'nonce', ~sid, ~nonce\>\l)\l}|{<n148> #vr.28 : Enclave_Step1[Enclave_Recv_Nonce( ~nonce ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Step2( )]\l}|{<n149> Enclave_step2( ~sid, ~nonce,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'config', pk(~sk), ~pcr_tcb, h(HO3), %1, ~key\>\l)\l|<n150> Ocall_enclave( ~nonce\l)\l}}",fillcolor="#a3dd9b",style="filled",fontcolor="black",role="Undefined"];
+n155[shape="record",label="{{<n152> TLS_Send( 'KMS', 'Enclave', \<'nonce', ~sid, ~nonce\> )}|{<n153> #vr.29 : TLS_Send_Recv[TLS_Record( 'KMS', 'Enclave', \<'nonce', ~sid, ~nonce\> )]}|{<n154> TLS_Recv( 'KMS', 'Enclave', \<'nonce', ~sid, ~nonce\> )}}",fillcolor="#a0dd9b",style="filled",fontcolor="black",role="Undefined"];
+n156[label="#vr.30 : d_0_snd",shape="ellipse"];
+n157[label="#vr.31 : d_0_snd",shape="ellipse"];
+n158[label="#vr.32 : d_0_fst",shape="ellipse"];
+n159[label="#vr.33 : d_0_snd",shape="ellipse"];
+n160[label="#vr.34 : d_0_snd",shape="ellipse"];
+n161[label="#vr.35 : d_0_snd",shape="ellipse"];
+n162[label="#vr.36 : d_0_snd",shape="ellipse"];
+n163[label="#vr.37 : d_0_fst",shape="ellipse"];
+n164[label="#vr.38 : d_0_snd",shape="ellipse"];
+n165[label="!KU( pid_app ) @ #vk.23",shape="ellipse",color="gray"];
+n166[label="!KU( pid_daemon ) @ #vk.24",shape="ellipse",color="gray"];
+n167[label="!KU( pid_recv ) @ #vk.30",shape="ellipse",color="gray"];
+n168[label="!KU( pid_send ) @ #vk.31",shape="ellipse",color="gray"];
+n5 -> n109[color="orangered2"];
+n10:n9 -> n3:n0[style="bold",weight="10.0"];
+n17:n15 -> n155:n152[style="bold",weight="10.0"];
+n17:n16 -> n10:n6[style="bold",weight="10.0"];
+n27:n25 -> n17:n12[style="bold",weight="10.0",color="gray50"];
+n37:n36 -> n17:n13[style="bold",weight="10.0"];
+n45:n42 -> n119:n113[style="bold",weight="10.0",color="gray50"];
+n45:n43 -> n27:n21[style="bold",weight="10.0",color="gray50"];
+n45:n43 -> n37:n31[style="bold",weight="10.0",color="gray50"];
+n45:n43 -> n87:n77[style="bold",weight="10.0",color="gray50"];
+n45:n44 -> n27:n22[style="bold",weight="10.0",color="gray50"];
+n45:n44 -> n37:n32[style="bold",weight="10.0",color="gray50"];
+n45:n44 -> n87:n78[style="bold",weight="10.0",color="gray50"];
+n45:n44 -> n119:n114[style="bold",weight="10.0",color="gray50"];
+n53:n51 -> n27:n23[style="bold",weight="10.0",color="gray50"];
+n60:n57 -> n130:n126[style="bold",weight="10.0",color="gray50"];
+n60:n58 -> n37:n33[style="bold",weight="10.0",color="gray50"];
+n64:n63 -> n10:n7[style="bold",weight="10.0"];
+n70:n69 -> n64:n61[style="bold",weight="10.0"];
+n75:n74 -> n70:n65[style="bold",weight="10.0"];
+n76 -> n91:n88[color="gray30"];
+n87:n84 -> n70:n66[style="bold",weight="10.0",color="gray50"];
+n87:n84 -> n130:n127[style="bold",weight="10.0",color="gray50"];
+n87:n85 -> n151:n145[style="bold",weight="10.0",color="gray50"];
+n87:n86 -> n151:n146[style="bold",weight="10.0"];
+n91:n90 -> n75:n72[style="bold",weight="10.0"];
+n98:n96 -> n87:n79[style="bold",weight="10.0",color="gray50"];
+n103:n101 -> n119:n115[style="bold",weight="10.0"];
+n103:n102 -> n87:n80[style="bold",weight="10.0"];
+n104 -> n144:n141[color="gray30"];
+n108:n107 -> n5[color="gray30"];
+n109 -> n110[color="orangered2"];
+n110 -> n111[color="orangered2"];
+n111 -> n120[color="orangered2"];
+n111 -> n157[color="orangered2"];
+n119:n117 -> n108:n105[style="bold",weight="10.0"];
+n120 -> n121[color="orangered2"];
+n121 -> n122[color="orangered2"];
+n121 -> n156[color="orangered2"];
+n122 -> n4[color="orangered2"];
+n130:n129 -> n119:n112[style="bold",weight="10.0"];
+n135:n133 -> n130:n123[style="bold",weight="10.0",color="gray50"];
+n140:n139 -> n130:n124[style="bold",weight="10.0"];
+n144:n143 -> n130:n125[style="bold",weight="10.0"];
+n151:n149 -> n75:n71[style="bold",weight="10.0"];
+n151:n150 -> n11[style="bold",weight="10.0",color="gray50"];
+n155:n154 -> n151:n147[style="bold",weight="10.0"];
+n156 -> n18[color="orangered2"];
+n157 -> n158[color="orangered2"];
+n157 -> n161[color="orangered2"];
+n158 -> n159[color="orangered2"];
+n159 -> n160[color="orangered2"];
+n160 -> n28[color="orangered2"];
+n161 -> n162[color="orangered2"];
+n162 -> n163[color="orangered2"];
+n162 -> n164[color="orangered2"];
+n163 -> n38[color="orangered2"];
+n164 -> n46[color="orangered2"];
+n4 -> n76[color="red",style="dashed"];
+n11 -> n104[color="red",style="dashed"];
+n18 -> n76[color="red",style="dashed"];
+n28 -> n76[color="red",style="dashed"];
+n38 -> n76[color="red",style="dashed"];
+n46 -> n76[color="red",style="dashed"];
+n110 -> n76[color="red",style="dashed"];
+n111 -> n76[color="red",style="dashed"];
+n120 -> n76[color="red",style="dashed"];
+n121 -> n76[color="red",style="dashed"];
+n165 -> n76[color="red",style="dashed"];
+n166 -> n76[color="red",style="dashed"];
+n167 -> n104[color="red",style="dashed"];
+n168 -> n104[color="red",style="dashed"];
+n157 -> n76[color="red",style="dashed"];
+n158 -> n76[color="red",style="dashed"];
+n159 -> n76[color="red",style="dashed"];
+n161 -> n76[color="red",style="dashed"];
+n162 -> n76[color="red",style="dashed"];
+{
+rank="sink";
+n169[shape="plain",label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="3" CELLPADDING="1"><TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">AT1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'attest_request'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">H2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">h(HO1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">H1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">h(&lt;H2, ~nonce, ~seal_key&gt;)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">H3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">h(&lt;H2, ~nonce&gt;)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code.1</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~host_code.2</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HO4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'host_hash_sealkey'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">RE1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'return_evidences'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SI1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">sign(&lt;'quote', ~pcr_tcb, ~nonce&gt;, ~sk)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SI2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">sign(&lt;'counter', (%1%+%1), ~nonce&gt;, ~sk)</TD></TR></TABLE>>];
+
+}
+n3:n1 -> n169[style="invis"];
+
+}
